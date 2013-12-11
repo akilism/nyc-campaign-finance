@@ -1,0 +1,58 @@
+Column	Type	Name	Description
+donation 1	Character	ELECTION	Election Cycle
+candidate 2	Character	OFFICECD	Office Sought: [1=Mayor; 2=Public Advocate; 3=Comptroller; 4=Borough President; 5=City Council; 6=Undeclared]
+candidate 3	Character	CANDID	Candidate ID, assigned by the CFB
+candidate 4	Character	CANCLASS	Campaign Finance Program Classification: [Participant, Non-Participant, Limited Participant, Undetermined]
+candidate 5	Character	CANDLAST	Candidate's Last Name
+candidate 6	Character	CANDFIRST	Candidate's First Name
+candidate 7	Character	CANDMI	Candidate's Middle Initial
+candidate 8	Character	COMMITTEE	Committee ID, assigned by the CFB
+candidate 9	Numeric	FILING	Disclosure Statement Filing Period
+donation 10	Character	SCHEDULE	Schedule: [ABC=Monetary Contributions; D=In-Kind Contributions; G=Transfers In; K=Loans/Liabilities Forgiven; M=Receipt Adjustments; N=Outstanding Liabilities]
+donation 11	Numeric	PAGENO	Page Number of schedule on which information was reported (paper filings only)
+donation 12	Numeric	SEQUENCENO	Sequence Number on page of schedule on which information was reported (paper filings only)
+donation 13	Character	REFNO	Transaction Reference Number
+donation 14	Date	DATE	Date Received
+donation 15	Date	REFUNDDATE	Date of Refund/Loan forgiven
+contributor 16	Character	NAME	Contributor's Name
+contributor 17	Character	C_CODE	Contributor Type: [CAN=Candidate; CORP=Corporation; EMPO=Labor Union; FAM=Candidate's Family; IND=Individual; LLC=Limited Liability Company; OTHR=Other; PART=Partnership; PCOMC=Candidate Committee; PCOMP=Political Action Committee; PCOMZ=Party Committee; SPO=Candidate's Spouse; UNKN=Unknown]
+contributor 18	Character	STRNO	Contributor's Street Number - If  C_CODE = IND, CAN, FAM or SPO, Then field = Blank 
+contributor 19	Character	STRNAME	Contributor's Street Name - If  C_CODE = IND, CAN, FAM or SPO, Then field = Blank 
+contributor 20	Character	APARTMENT	Contributor's Apartment Number - If  C_CODE = IND, CAN, FAM or SPO, Then field = Blank 
+contributor 21	Character	BOROUGHCD	Contributor's Borough Code: [K=Brooklyn; M=Manhattan; Q=Queens; S=Staten Island; X=Bronx; Z=Outside New York City]
+contributor 22	Character	CITY	Contributor's City, Schedule N - Vendor's City
+contributor 23	Character	STATE	Contributor's State, Schedule N - Vendor's State
+contributor 24	Character	ZIP	Contributor's Zip Code
+contributor 25	Character	OCCUPATION	Contributor's Occupation
+employer 26	Character	EMPNAME	Contributor's Employer
+employer 27	Character	EMPSTRNO	Contributor's Employer's Street Number
+employer 28	Character	EMPSTRNAME	Contributor's Employer's Street Name
+employer 29	Character	EMPCITY	Contributor's Employer's City
+employer 30	Character	EMPSTATE	Contributor's Employer's State
+donation 31	Numeric	AMNT	Amount
+donation 32	Numeric	MATCHAMNT	Matchable Amount of Contribution
+donation 33	Numeric	PREVAMNT	Total of Previous Contributions
+donation 34	Numeric	PAY_METHOD	Method of Payment: [0=Unknown; 1=Cash; 2=Check; 3=Other; 4=Credit Card; 5=Money Order]
+intermediary 35	Character	INTERMNO	Intermediary Number, assigned by candidate
+intermediary 36	Character	INTERMNAME	Intermediary's Name (if any)  
+intermediary 37	Character	INTSTRNO	"Intermediary's Street Number, assigned by candidate 
+						If C_CODE = IND, CAN, FAM or SPO, Then field = Blank"
+intermediary 38	Character	INTSTRNM	"Intermediary's Street Name  
+						If C_CODE = IND, CAN, FAM or SPO, Then field = Blank"
+intermediary 39	Character	INTAPTNO	"Intermediary's Apartment Number  
+						If C_CODE = IND, CAN, FAM or SPO, Then field = Blank"
+intermediary 40	Character	INTCITY	Intermediary's City
+intermediary 41	Character	INTST	Intermediary's State
+intermediary 42	Character	INTZIP	Intermediary's Zip Code
+employer 43	Character	INTEMPNAME	Intermediary's Employer Name
+employer 44	Character	INTEMPSTNO	Intermediary's Employer Street Number 
+employer 45	Character	INTEMPSTNM	Intermediary's Employer Street Name
+employer 46	Character	INTEMPCITY	Intermediary's Employer City 
+employer 47	Character	INTEMPST	Intermediary's Employer State
+intermediary 48	Character	INTOCCUPA	Intermediary's Occupation
+donation 49	Character	PURPOSECD	Purpose Code (for Schedule D/In-Kind Contributions): [ADVAN=Advance Repayment; CMAIL=Campaign Mailings; CMISC=Campaign Miscellaneous; CNTRB=Political Contributions; COMPL=Compliance Cost; CONSL=Campaign Consultants; CONSV=Constituent Services; FUNDR=Fundraising; INTER=Interest Expenses; LITER=Campaign Literature; NQUAL=Non Qualified Expenditures; OFFCE=Office Expenses; OTHER=Other; PETIT=Petition Expenses; POLLS=Polling Costs; POSTA=Postage Expenses; PRINT=Printing Expenses; PROFL=Professional Services; RADIO=Radio Ads; RENTO=Office Rent; TVADS=Television Ads; UNKN=Unknown; VOTER=Voter Registration; WAGES=Campaign Workers Salaries]
+donation 50	Character	EXEMPTCD	Exempt Code: [C=Compliance Costs; E=Previous Election Costs; P=Petition Challenges; S=Constituent Services; U=Unknown; Blank = Not Exempt]
+donation 51	Character	ADJTYPECD	Schedule M /Adjustment Type Code: [0=Unknown; 1=Returned Check 2=Refund; 5=Other]
+donation 52	Character	RR-IND	Runoff/Rerun Indicator
+donation 53	Character	SEG-IND	Segregated Indicator
+intermediary 54	Character	INT_C_CODE	Intermediary's Name Code
