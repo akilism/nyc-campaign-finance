@@ -3,6 +3,7 @@ __author__ = 'akil.harris'
 import csv
 import psycopg2
 from data_objects import *
+from data_structures import BinarySearch
 
 LINES_PER_BATCH = 500
 
@@ -52,14 +53,18 @@ class DataSet:
 
     def __init__(self):
         self.raw_data = []
+        self.all_data = None
         self.data = {
-            'candidates': [],
-            'contributors': [],
-            'employers': [],
+            'candidates': BinarySearch(),
+            'contributors': BinarySearch(),
+            'employers': BinarySearch(),
             'contributions': [],
-            'intermediaries': [],
-            'occupations': []
+            'intermediaries': BinarySearch(),
+            'occupations': BinarySearch()
         }
+
+    def set_all_data(self, all_data):
+        self.all_data = all_data
 
     def set_data(self, raw_data):
         self.raw_data = raw_data
@@ -229,6 +234,52 @@ class DataSet:
         for contribution in self.data['contributions']:
             print(contribution)
 
+    def build_all(self):
+        c = 0
+        i = 0
+        o = 0
+        ca = 0
+        e = 0
+
+        for data in self.all_data:
+            candidate = Candidate(data[4], data[1], data[2], data[3], data[5], data[6])
+            employer = Employer(data[23], data[24], data[25], data[26], data[27])
+            occupation = Occupation(data[22].title())
+            #TODO setup database to save these then fill in based on value in csv
+            intermediary = Intermediary(data[32].title(), data[33], data[34], data[35], data[36], data[37], data[38], data[39], 0, 0, data[51])
+            #TODO setup database to save these then fill in based on value in csv
+            contributor = Contributor(data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], 0, 0)
+            #TODO setup database to save these then fill in based on value in csv
+            contribution = Contribution(0, 0, 0, data[7], data[8], data[9], data[10], data[11], data[12], data[28], data[29], data[30], data[31], data[46], data[47], data[48], data[49], data[50], data[0])
+
+            self.data['contributions'].append(contribution)
+
+            if not self.data['contributors'].contains(contributor):
+                c += 1
+                self.data['contributors'].put(contributor, c)
+
+            if not self.data['intermediaries'].contains(intermediary):
+                i += 1
+                self.data['intermediaries'].put(intermediary, i)
+
+            if not self.data['occupations'].contains(occupation):
+                o += 1
+                self.data['occupations'].put(occupation, o)
+
+            if not data[22].title() != data[45].title():
+                occupation2 = Occupation(data[45].title())
+                if self.data['occupations'].contains(occupation2):
+                    o += 1
+                    self.data['occupations'].put(occupation2, o)
+
+            if not self.data['candidates'].contains(candidate):
+                ca += 1
+                self.data['candidates'].put(candidate, ca)
+
+            if not self.data['employers'].contains(employer):
+                e += 1
+                self.data['employers'].put(employer, e)
+
 
 class PostgreSQLConnector:
 
@@ -259,18 +310,25 @@ fr.read_file()
 print(str(fr))
 
 ds2013 = DataSet()
+
+# for data in fr.raw_data:
+#     ds2013.set_data(data)
+#     ds2013.build_candidates()
+#     ds2013.build_employers()
+#     ds2013.build_occupations()
+#     ds2013.build_intermediaries()
+#     ds2013.build_contributors()
+#     ds2013.build_contributions()
+
+# print(fr.raw_data[0])
+
 for data in fr.raw_data:
-    ds2013.set_data(data)
-    ds2013.build_candidates()
-    ds2013.build_employers()
-    ds2013.build_occupations()
-    ds2013.build_intermediaries()
-    ds2013.build_contributors()
-    ds2013.build_contributions()
+    ds2013.set_all_data(data)
+    ds2013.build_all()
 
 ds2013.print_candidates()
 ds2013.print_employers()
 ds2013.print_occupations()
 # ds2013.print_intermediaries()
-ds2013.print_contributors()
+# ds2013.print_contributors()
 # ds2013.print_contributions()

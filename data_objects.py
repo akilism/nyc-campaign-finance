@@ -42,6 +42,27 @@ class Candidate:
     def __str__(self):
         return str(self.name) + " - " + str(self.office)
 
+    def is_self(self, other):
+        if self.office_id == other.office_id and  \
+           self.name == other.name:
+            return True
+        return False
+
+    def compare_to(self, other):
+        if self.office_id > other.office_id:
+            return 1
+        if self.office_id < other.office_id:
+            return -1
+        if self.cfb_id > other.cfb_id:
+            return 1
+        if self.cfb_id < other.cfb_id:
+            return -1
+        if self.name > other.name:
+            return 1
+        if self.name < other.name:
+            return -1
+        return 0
+
 
 class Contribution:
 
@@ -158,17 +179,32 @@ class Contributor:
             return 'Unknown'
 
     def __str__(self):
-        return self.name + ' - ' + self.type
+        return self.name + ' - ' + str(self.type)
 
     def is_self(self, other):
         if self.name.lower() == other.name.lower() and \
            self.street_no == other.street_no and \
-           self.street_name.lower() == other.street_name.lower() and \
-           self.city.lower() == other.city.lower() and \
-           self.c_code == other.c_code and \
-           self.state.lower() == other.state.lower():
+           self.street_name.lower() == other.street_name.lower(): # and \
+           # self.city.lower() == other.city.lower() and \
+           # self.c_code == other.c_code and \
+           # self.state.lower() == other.state.lower():
             return True
         return False
+
+    def compare_to(self, other):
+        if self.name.lower() > other.name.lower():
+            return 1
+        if self.name.lower() < other.name.lower():
+            return -1
+        if self.street_name.lower() > other.street_name.lower():
+            return 1
+        if self.street_name.lower() < other.street_name.lower():
+            return -1
+        if self.street_no > other.street_no:
+            return 1
+        if self.street_no < other.street_no:
+            return -1
+        return 0
 
 
 class Employer:
@@ -192,6 +228,21 @@ class Employer:
            # self.street_name.lower() == other.street_name.lower() and \
             return True
         return False
+
+    def compare_to(self, other):
+        if self.name.lower() > other.name.lower():
+            return 1
+        if self.name.lower() < other.name.lower():
+            return -1
+        if self.city.lower() > other.city.lower():
+            return 1
+        if self.city.lower() < other.city.lower():
+            return -1
+        if self.state.lower() > other.state.lower():
+            return 1
+        if self.state.lower() < other.state.lower():
+            return -1
+        return 0
 
 
 class Intermediary:
@@ -218,11 +269,26 @@ class Intermediary:
     def is_self(self, other):
         if self.name.lower() == other.name.lower() and \
            self.street_no == other.street_no and \
-           self.street_name.lower() == other.street_name.lower() and \
-           self.city.lower() == other.city.lower() and \
-           self.state.lower() == other.state.lower():
+           self.street_name.lower() == other.street_name.lower(): # and \
+           # self.city.lower() == other.city.lower() and \
+           # self.state.lower() == other.state.lower():
             return True
         return False
+
+    def compare_to(self, other):
+        if self.name.lower() > other.name.lower():
+            return 1
+        if self.name.lower() < other.name.lower():
+            return -1
+        if self.street_name.lower() > other.street_name.lower():
+            return 1
+        if self.street_name.lower() < other.street_name.lower():
+            return -1
+        if self.street_no.lower() > other.street_no.lower():
+            return 1
+        if self.street_no.lower() < other.street_no.lower():
+            return -1
+        return 0
 
 
 class Occupation:
@@ -238,3 +304,10 @@ class Occupation:
         if self.name.lower() == other.name.lower():
             return True
         return False
+
+    def compare_to(self, other):
+        if self.name.lower() > other.name.lower():
+            return 1
+        if self.name.lower() < other.name.lower():
+            return -1
+        return 0
