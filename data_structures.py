@@ -3,11 +3,13 @@ __author__ = 'akil.harris'
 import random
 import math
 
+
 class Node:
 
-    def __init__(self, item, link):
+    def __init__(self, item, link, link_right=None):
         self.item = item
-        self.link = link
+        self.link_left = link
+        self.link_right = link_right
 
 
 class Stack:
@@ -24,7 +26,7 @@ class Stack:
             raise StopIteration
         else:
             item = self.node.item
-            self.node = self.node.link
+            self.node = self.node.link_left
             self.size -= 1
             return item
 
@@ -39,7 +41,7 @@ class Stack:
     def pop(self):
         if self.node is not None:
             item = self.node.item
-            self.node = self.node.link
+            self.node = self.node.link_left
             self.size -= 1
             return item
         else:
@@ -64,7 +66,7 @@ class Queue:
             raise StopIteration
         else:
             item = self.first.item
-            self.first = self.first.link
+            self.first = self.first.link_left
             self.size -= 1
             return item
 
@@ -73,14 +75,14 @@ class Queue:
             self.first = Node(item, None)
             self.last = self.first
         else:
-            self.last.link = Node(item, None)
-            self.last = self.last.link
+            self.last.link_left = Node(item, None)
+            self.last = self.last.link_left
         self.size += 1
 
     def dequeue(self):
         if self.first is not None:
             item = self.first.item
-            self.first = self.first.link
+            self.first = self.first.link_left
             self.size -= 1
             return item
         else:
@@ -108,7 +110,7 @@ class Deque:
             raise StopIteration
         else:
             item = self.first.item
-            self.first = self.first.link
+            self.first = self.first.link_left
             self.size -= 1
             return item
 
@@ -128,13 +130,13 @@ class Deque:
         else:
             old_last = self.last
             self.last = Node(item, None)
-            old_last.link = self.last
+            old_last.link_left = self.last
         self.size += 1
 
     def pop_left(self):
         if self.first is not None:
             item = self.first.item
-            self.first = self.first.link
+            self.first = self.first.link_left
             self.size -= 1
             return item
         else:
@@ -143,7 +145,7 @@ class Deque:
     def pop_right(self):
         if self.last is not None:
             item = self.last.item
-            self.last = self.last.link
+            self.last = self.last.link_left
             self.size -= 1
             return item
         else:
@@ -164,7 +166,7 @@ class Bag:
             raise StopIteration
         else:
             item = self.node.item
-            self.node = self.node.link
+            self.node = self.node.link_left
             self.size -= 1
             return item
 
@@ -264,7 +266,8 @@ class WeightedUnionFind:
 class QuickSort:
 
     def __init__(self, items):
-        self.items = random.shuffle(items)
+        self.items = items
+        random.shuffle(self.items)
         self.sort(self.items, 0, len(self.items)-1)
 
     def sort(self, items, lo, high):
@@ -281,26 +284,31 @@ class QuickSort:
         a[j] = x
 
     def less(self, i, j):
-        return i.compare_to(j) < 0;
+        return i.compare_to(j) < 0
 
     def partition(self, items, high, lo):
         i = lo
         j = high + 1
-        partition_element = items[lo]
+
         while True:
-            while self.less(a[i], partition_element):
-                i += 1
+            i += 1
+            while self.less(items[i], items[lo]):
                 if i == high:
                     break
-            while self.less(partition_element, a[j]):
-                j -= 1
+                i += 1
+
+            j -= 1
+            while self.less(items[lo], items[j]):
                 if j == lo:
                     break
+                j -= 1
+
             if i >= j:
                 break
-            self.exch(a, i, j)
 
-        self.exch(a, lo, j)
+            self.exch(items, i, j)
+
+        self.exch(items, lo, j)
         return j
 
 
@@ -325,7 +333,7 @@ class MinPQ:
         l = len(self.items)
         while l > 1 and self.less(l/2, l):
             self.exch(l/2, l)
-            l = l/2
+            l /= 2
 
 
 class BinarySearch:
@@ -357,7 +365,7 @@ class BinarySearch:
         hi = self.size - 1
 
         while lo <= hi:
-            mid = math.floor(lo + (hi - lo) / 2)
+            mid = math.floor((lo + hi) / 2)
 
             if key.compare_to(self.keys[mid]) < 0:
                 hi = mid - 1

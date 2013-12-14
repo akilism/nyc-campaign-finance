@@ -37,7 +37,7 @@ class Candidate:
             return parts[2].strip() + ' ' + parts[0].strip() + ' ' + parts[1].strip()
         elif len(parts) > 1:
             return parts[1].strip() + ' ' + parts[0].strip()
-        return raw_name
+        return raw_name.strip(' \t\n\r')
 
     def __str__(self):
         return str(self.name) + " - " + str(self.office)
@@ -49,10 +49,10 @@ class Candidate:
         return False
 
     def compare_to(self, other):
-        if self.office_id > other.office_id:
-            return 1
-        if self.office_id < other.office_id:
-            return -1
+        # if self.office_id > other.office_id:
+        #     return 1
+        # if self.office_id < other.office_id:
+        #     return -1
         if self.cfb_id > other.cfb_id:
             return 1
         if self.cfb_id < other.cfb_id:
@@ -134,7 +134,7 @@ class Contribution:
 class Contributor:
 
     def __init__(self, name, c_code, street_no, street_name, apartment, borough_code, city, state, zip_code, employer_id, occupation_id, contributor_id=0):
-        self.name = name
+        self.name = name.strip(' \t\n\r')
         self.c_code = c_code
         self.type = self.get_contributor_type()
         self.street_no = street_no
@@ -210,7 +210,7 @@ class Contributor:
 class Employer:
 
     def __init__(self, name, street_no, street_name, city, state, employer_id=0):
-        self.name = name
+        self.name = name.strip(' \t\n\r')
         self.street_no = street_no
         self.street_name = street_name
         self.city = city
@@ -249,7 +249,7 @@ class Intermediary:
 
     def __init__(self, number, name, street_no, street_name, apartment, city, state, zip_code, occupation_id, employer_id, name_code, intermediary_id=0):
         self.number = number
-        self.name = name
+        self.name = name.strip(' \t\n\r')
         self.street_no = street_no
         self.street_name = street_name
         self.apartment = apartment
@@ -294,7 +294,7 @@ class Intermediary:
 class Occupation:
 
     def __init__(self, name, occupation_id=0):
-        self.name = name
+        self.name = name.strip(' \t\n\r')
         self.occupation_id = occupation_id
 
     def __str__(self):

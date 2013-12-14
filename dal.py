@@ -1,9 +1,9 @@
 __author__ = 'akil.harris'
 
 import csv
-import psycopg2
+#import psycopg2
 from data_objects import *
-from data_structures import BinarySearch
+from data_structures import *
 
 LINES_PER_BATCH = 500
 
@@ -55,13 +55,14 @@ class DataSet:
         self.raw_data = []
         self.all_data = None
         self.data = {
-            'candidates': BinarySearch(),
-            'contributors': BinarySearch(),
-            'employers': BinarySearch(),
+            'candidates': [],
+            'contributors': [],
+            'employers': [],
             'contributions': [],
-            'intermediaries': BinarySearch(),
-            'occupations': BinarySearch()
+            'intermediaries': [],
+            'occupations': []
         }
+        self.quick_sort = None
 
     def set_all_data(self, all_data):
         self.all_data = all_data
@@ -235,75 +236,96 @@ class DataSet:
             print(contribution)
 
     def build_all(self):
-        c = 0
-        i = 0
-        o = 0
-        ca = 0
-        e = 0
 
-        for data in self.all_data:
-            candidate = Candidate(data[4], data[1], data[2], data[3], data[5], data[6])
-            employer = Employer(data[23], data[24], data[25], data[26], data[27])
-            occupation = Occupation(data[22].title())
-            #TODO setup database to save these then fill in based on value in csv
-            intermediary = Intermediary(data[32].title(), data[33], data[34], data[35], data[36], data[37], data[38], data[39], 0, 0, data[51])
-            #TODO setup database to save these then fill in based on value in csv
-            contributor = Contributor(data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], 0, 0)
-            #TODO setup database to save these then fill in based on value in csv
-            contribution = Contribution(0, 0, 0, data[7], data[8], data[9], data[10], data[11], data[12], data[28], data[29], data[30], data[31], data[46], data[47], data[48], data[49], data[50], data[0])
+        for line_data in self.all_data:
 
+            if line_data[4] is not '':
+                candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5], line_data[6])
+                if binary_search(self.data['candidates'], candidate, len(self.data['candidates'])-1, 0) is None:
+                    self.data['candidates'].append(candidate)
+                    self.data['candidates'] = QuickSort(self.data['candidates']).items
+
+            if line_data[23] is not '':
+                employer = Employer(line_data[23], line_data[24], line_data[25], line_data[26], line_data[27])
+                if binary_search(self.data['employers'], employer, len(self.data['employers'])-1, 0) is None:
+                    self.data['employers'].append(employer)
+                    self.data['employers'] = QuickSort(self.data['employers']).items
+
+            if line_data[22] is not '':
+                added_occupation = False
+                occupation = Occupation(line_data[22].title())
+                if binary_search(self.data['occupations'], occupation, len(self.data['occupations'])-1, 0) is None:
+                    self.data['occupations'].append(occupation)
+                    added_occupation = True
+
+                if not line_data[22].title() != line_data[45].title():
+                    occupation2 = Occupation(line_data[45].title())
+                    if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
+                        self.data['occupations'].append(occupation2)
+                        added_occupation = True
+
+                if added_occupation:
+                    self.data['occupations'] = QuickSort(self.data['occupations']).items
+
+            if line_data[33] is not '':
+                #TODO setup database to save these then fill in based on value in csv
+                intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35], line_data[36], line_data[37], line_data[38], line_data[39], 0, 0, line_data[51])
+                if binary_search(self.data['intermediaries'], intermediary, len(self.data['intermediaries'])-1, 0) is None:
+                    self.data['intermediaries'].append(intermediary)
+                    self.data['intermediaries'] = QuickSort(self.data['intermediaries']).items
+
+            if line_data[13] is not '':
+                #TODO setup database to save these then fill in based on value in csv
+                contributor = Contributor(line_data[13], line_data[14], line_data[15], line_data[16], line_data[17], line_data[18], line_data[19], line_data[20], line_data[21], 0, 0)
+                if binary_search(self.data['contributors'], contributor, len(self.data['contributors'])-1, 0) is None:
+                    self.data['contributors'].append(contributor)
+                    self.data['contributors'] = QuickSort(self.data['contributors']).items
+
+            #TODO setup database to save these then fill in based on value in csv
+            contribution = Contribution(0, 0, 0, line_data[7], line_data[8], line_data[9], line_data[10], line_data[11], line_data[12], line_data[28], line_data[29], line_data[30], line_data[31], line_data[46], line_data[47], line_data[48], line_data[49], line_data[50], line_data[0])
             self.data['contributions'].append(contribution)
 
-            if not self.data['contributors'].contains(contributor):
-                c += 1
-                self.data['contributors'].put(contributor, c)
 
-            if not self.data['intermediaries'].contains(intermediary):
-                i += 1
-                self.data['intermediaries'].put(intermediary, i)
+def binary_search(search_data, key, hi, lo):
 
-            if not self.data['occupations'].contains(occupation):
-                o += 1
-                print(occupation)
-                self.data['occupations'].put(occupation, o)
+    if len(search_data) == 0:
+        return None
 
-            if not data[22].title() != data[45].title():
-                occupation2 = Occupation(data[45].title())
-                if self.data['occupations'].contains(occupation2):
-                    o += 1
-                    self.data['occupations'].put(occupation2, o)
+    if hi < lo:
+        return None
 
-            if not self.data['candidates'].contains(candidate):
-                ca += 1
-                self.data['candidates'].put(candidate, ca)
+    mid = math.floor((lo + hi) / 2)
 
-            if not self.data['employers'].contains(employer):
-                e += 1
-                self.data['employers'].put(employer, e)
+    if search_data[mid].compare_to(key) > 0:
+        return binary_search(search_data, key, mid-1, lo)
+    elif search_data[mid].compare_to(key) < 0:
+        return binary_search(search_data, key, hi, mid+1)
+    else:
+        return search_data[mid]
 
 
-class PostgreSQLConnector:
-
-    def __init__(self):
-        self.conn = psycopg2.connect("dbname=nyc_campaign_finance user=akil password=d3l3ting host=localhost port=5432")
-        self.cur = self.conn.cursor()
-
-    def get_cursor(self):
-        return self.cur
-
-    def close_cursor(self):
-        self.cur.close()
-
-    def open_cursor(self):
-        self.close_cursor()
-        self.cur = self.conn.cursor()
-
-    def close_connection(self):
-        self.close_cursor()
-        self.conn.close()
-
-    def commit_changes(self):
-        self.conn.commit()
+# class PostgreSQLConnector:
+#
+#     def __init__(self):
+#         self.conn = psycopg2.connect("dbname=nyc_campaign_finance user=akil password=d3l3ting host=localhost port=5432")
+#         self.cur = self.conn.cursor()
+#
+#     def get_cursor(self):
+#         return self.cur
+#
+#     def close_cursor(self):
+#         self.cur.close()
+#
+#     def open_cursor(self):
+#         self.close_cursor()
+#         self.cur = self.conn.cursor()
+#
+#     def close_connection(self):
+#         self.close_cursor()
+#         self.conn.close()
+#
+#     def commit_changes(self):
+#         self.conn.commit()
 
 
 fr = FileReader('sample0.csv')
@@ -323,13 +345,18 @@ ds2013 = DataSet()
 
 # print(fr.raw_data[0])
 
+x = 0
 for data in fr.raw_data:
     ds2013.set_all_data(data)
     ds2013.build_all()
-    break
+    x += 1
+    if x > 20:
+        break
 
 ds2013.print_candidates()
-ds2013.print_employers()
+print("*************************")
+print("*************************")
+print("*************************")
 ds2013.print_occupations()
 # ds2013.print_intermediaries()
 # ds2013.print_contributors()
