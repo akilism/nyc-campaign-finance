@@ -264,6 +264,7 @@ class DataSet:
 
             if not self.data['occupations'].contains(occupation):
                 o += 1
+                print(occupation)
                 self.data['occupations'].put(occupation, o)
 
             if not data[22].title() != data[45].title():
@@ -325,6 +326,7 @@ ds2013 = DataSet()
 for data in fr.raw_data:
     ds2013.set_all_data(data)
     ds2013.build_all()
+    break
 
 ds2013.print_candidates()
 ds2013.print_employers()

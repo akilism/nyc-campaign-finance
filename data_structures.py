@@ -19,7 +19,7 @@ class Stack:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.node is None:
             raise StopIteration
         else:
@@ -59,7 +59,7 @@ class Queue:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.first is None:
             raise StopIteration
         else:
@@ -103,7 +103,7 @@ class Deque:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.first is None:
             raise StopIteration
         else:
@@ -159,7 +159,7 @@ class Bag:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.node is None:
             raise StopIteration
         else:
@@ -334,6 +334,17 @@ class BinarySearch:
         self.keys = []
         self.values = []
         self.size = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.is_empty():
+            raise StopIteration
+
+        for x in self.keys:
+            self.size -= 1
+            return x
 
     def __sizeof__(self):
         return self.size
