@@ -1,5 +1,7 @@
 __author__ = 'akil.harris'
 
+import datetime
+from decimal import *
 
 class Candidate:
 
@@ -71,19 +73,20 @@ class Contribution:
         self.pageno = pageno
         self.seqno = seqno
         self.refno = refno
-        self.date = date
-        self.refdate = refdate
-        self.amount = amount
-        self.match_amount = match_amount
-        self.prev_total = prev_total
-        self.payment_method_id = payment_method_id
+        self.date = get_date(date)
+        self.refdate = get_date(refdate)
+        self.amount = Decimal(amount)
+        self.match_amount = Decimal(match_amount)
+        self.prev_total = Decimal(prev_total)
+        self.payment_method_id = int(payment_method_id)
         self.payment_method = self.get_payment_method()
         self.purpose_code_id = purpose_code_id
+        print(self.purpose_code_id)
         self.purpose_code = self.get_purpose_code()
         self.exempt_code_id = exempt_code_id
         self.adjustment_type_code_id = adjustment_type_code_id
-        self.is_runoff = is_runoff
-        self.is_segregated = is_segregated
+        self.is_runoff = to_bool(is_runoff)
+        self.is_segregated = to_bool(is_segregated)
         self.candidate_id = candidate_id
         self.contributor_id = contributor_id
         self.intermediary_id = intermediary_id
@@ -91,7 +94,7 @@ class Contribution:
         self.contribution_id = contribution_id
 
     def get_payment_method(self):
-        if self.payment_method_id == 1:
+        if self.payment_method_id == 1 or self.payment_method_id == 0:
             return 'Unknown'
         elif self.payment_method_id == 2:
             return 'Cash'
@@ -343,3 +346,20 @@ def reformat_name(name):
     if len(parts) > 1:
         name = parts[1].strip() + " " + parts[0].strip()
     return name
+
+
+def get_date(date_str):
+    parts = date_str.split("/")
+    '6/30/2008'
+    if len(parts) >= 3:
+        return datetime.date(int(parts[2]), int(parts[0]), int(parts[1]))
+    return None
+
+
+def to_bool(value):
+    value = value.lower()
+    if value == 'n':
+        return False
+    elif value == 'y':
+        return True
+

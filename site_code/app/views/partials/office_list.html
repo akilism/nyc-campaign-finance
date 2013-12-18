@@ -1,5 +1,5 @@
 <ul class="candidate-offices">
     <li ng-repeat="office in offices">
-        <span class="office-count">{{office.count}}</span> <a href="#/office/{{office.office_id}}">{{office.office}} Candidates.</a>
+       <a ng-href="#/office/{{office.office_id}}"><span class="office-count">{{office.count}}</span> {{office.office}} Candidates.</a>
     </li>
 </ul>

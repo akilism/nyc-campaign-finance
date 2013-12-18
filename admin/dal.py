@@ -76,6 +76,9 @@ class PostgreSQLConnector:
     def commit_changes(self):
         self.conn.commit()
 
+    def cursor_closed(self):
+        return self.cur.closed
+
 
 class DataSet:
 
@@ -278,8 +281,10 @@ class DataSet:
         for line_data in self.all_data:
 
             if line_data[4] is not '':
-                candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5], line_data[6])
+                candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5],
+                                      line_data[6])
                 candidate_id = self.get_candidate_id(candidate, cursor)
+                # print(str(candidate) + " : " + str(candidate_id) + " : " + str(candidate.candidate_id))
                 # if binary_search(self.data['candidates'], candidate, len(self.data['candidates'])-1, 0) is None:
                 #     self.data['candidates'].append(candidate)
                 #     self.save_candidate(candidate, cursor)
@@ -306,8 +311,8 @@ class DataSet:
             #         added_occupation = True
             #
             # if not line_data[22].title() != line_data[45].title():
-            # if line_data[45] is not '':
-            #     occupation2 = Occupation(line_data[45].title())
+            if line_data[45] is not '':
+                occupation2 = Occupation(line_data[45].title())
                 # if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
                 #     self.data['occupations'].append(occupation2)
                 #     self.save_occupation(occupation2, cursor)
@@ -315,19 +320,20 @@ class DataSet:
 
             # if added_occupation:
             #     self.data['occupations'] = QuickSort(self.data['occupations']).items
-
-
             #
             if line_data[33] is not '':
                 occupation2_id = -1
                 if occupation2 is not None:
                     occupation2_id = self.get_occupation_id(occupation2, cursor)
-            #
-            #     employer2_id = -1
-            #     if employer2 is not None:
-            #         employer2_id = self.get_employer_id(employer2, cursor)
-            #
-            #     intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35], line_data[36], line_data[37], line_data[38], line_data[39], occupation2_id, employer2_id, line_data[51])
+                    cursor = self.db.get_cursor()
+
+                employer2_id = -1
+                if employer2 is not None:
+                    employer2_id = self.get_employer_id(employer2, cursor)
+
+                intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35],
+                                            line_data[36], line_data[37], line_data[38], line_data[39], occupation2_id,
+                                            employer2_id, line_data[51])
             #     if binary_search(self.data['intermediaries'], intermediary, len(self.data['intermediaries'])-1, 0) is None:
             #         if employer2_id != -1:
             #             intermediary.employer = employer2.name
@@ -343,14 +349,18 @@ class DataSet:
                 occupation_id = -1
                 if occupation is not None:
                     occupation_id = self.get_occupation_id(occupation, cursor)
+                    cursor = self.db.get_cursor()
                 #
                 # employer_id = -1
                 # if employer is not None:
                 #     employer_id = self.get_employer_id(employer, cursor)
-                contributor = Contributor(line_data[13], line_data[14], line_data[15], line_data[16], line_data[17], line_data[18], line_data[19], line_data[20], line_data[21], 0, 0)
+                contributor = Contributor(line_data[13], line_data[14], line_data[15], line_data[16], line_data[17],
+                                          line_data[18], line_data[19], line_data[20], line_data[21], 0, 0)
                 if contributor is not None:
                     contributor.occupation_id = occupation_id
                     contributor_id = self.get_contributor_id(contributor, cursor)
+                    cursor = self.db.get_cursor()
+                    # print(str(contributor) + " : " + str(contributor_id) + " : " + str(contributor.contributor_id))
                 # contributor.occupation_id = occupation_id
                 # contributor.employer_id = employer_id
                 # if self.fetch_contributor_by_name_zip_c_code_occupation(contributor, cursor) is None:
@@ -364,47 +374,43 @@ class DataSet:
             intermediary_id = 0
             if intermediary is not None:
                 intermediary.occupation_id = occupation2_id
-                intermediary_id = self.fetch_intermediary_by_name_zip_occupation_id(intermediary.name, intermediary.zip_code, intermediary.occupation_id, cursor)
+                intermediary_id = self.get_intermediary_id(intermediary, cursor)
+                cursor = self.db.get_cursor()
+                # print(str(intermediary) + " : " + str(intermediary_id) + " : " + str(intermediary.intermediary_id))
             #
             # print("candidate: " + str(candidate_id))
             # print("contributor: " + str(contributor_id))
             # print("intermediary: " + str(intermediary_id))
-            contribution = Contribution(candidate_id, contributor_id, intermediary_id, line_data[7], line_data[8], line_data[9], line_data[10], line_data[11], line_data[12], line_data[28], line_data[29], line_data[30], line_data[31], line_data[46], line_data[47], line_data[48], line_data[49], line_data[50], line_data[0])
+
+            contribution = Contribution(candidate_id, contributor_id, intermediary_id, line_data[7], line_data[8],
+                                        line_data[9], line_data[10], line_data[11], line_data[12], line_data[28],
+                                        line_data[29], line_data[30], line_data[31], line_data[46], line_data[47],
+                                        line_data[48], line_data[49], line_data[50], line_data[0])
+            if int(contributor_id) != 0:
+                self.save_contribution(contribution, cursor)
             # print(contribution)
             # self.data['contributions'].append(contribution)
 
-    def save_contributions(self, contribution, cursor):
-        # if contribution.intermediary_id == 0 or contribution.intermediary_id == -1 or contribution.intermediary_id is None:
-        #     contribution.intermediary_id = 6461
+    def save_contribution(self, contribution, cursor):
+        if contribution.intermediary_id == 0 or contribution.intermediary_id == -1:
+            contribution.intermediary_id = None
         try:
-#             contribution_id serial PRIMARY KEY,
-            # schedule character(200),
-# pageno character(500),
-# seqno character(500),
-# refno character(200),
-# date date,
-# refdate date,
-# amount money,
-# match_amount money,
-# prev_total money,
-# payment_method_id integer,
-# payment_method character(500),
-# purpose_code_id character(100),
-# purpose_code character(500),
-# exempt_code_id character(500),
-# adjustment_type_code_id character(500),
-# is_runoff boolean,
-# is_segregated boolean,
-# candidate_id integer REFERENCES candidates (candidate_id),
-# contributor_id integer REFERENCES contributors (contributor_id),
-# intermediary_id integer REFERENCES intermediaries (intermediary_id),
-# election_cycle character(500)
-            cursor.execute("Insert into contributions (schedule, pageno, seqno, ) VALUES (%s, %s)", (occupation.name, occupation.search_name))
-            print("Inserting occupation     : " + str(contribution))
+            cursor.execute("Insert into contributions (schedule, pageno, seqno, refno, contribution_date, refund_date, "
+                           "amount, match_amount, prev_total, payment_method_id, payment_method, purpose_code_id, "
+                           "purpose_code, exempt_code_id, adjustment_type_code_id, is_runoff, is_segregated, "
+                           "candidate_id, contributor_id, intermediary_id, election_cycle) VALUES "
+                           "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                           (contribution.schedule, contribution.pageno, contribution.seqno, contribution.refno
+                            , contribution.date, contribution.refdate, contribution.amount, contribution.match_amount
+                            , contribution.prev_total, contribution.payment_method_id, contribution.payment_method
+                            , contribution.purpose_code_id, contribution.purpose_code, contribution.exempt_code_id
+                            , contribution.adjustment_type_code_id, contribution.is_runoff, contribution.is_segregated
+                            , contribution.candidate_id, contribution.contributor_id, contribution.intermediary_id
+                            , contribution.election_cycle))
+            print("Inserting contribution     : " + str(contribution))
         except psycopg2.IntegrityError:
             print("Already inserted   : " + str(contribution))
         self.db.commit_changes()
-
 
     def save_candidate(self, candidate, cursor):
         try:
@@ -419,7 +425,8 @@ class DataSet:
 
     def save_occupation(self, occupation, cursor):
         try:
-            cursor.execute("Insert into occupations (name, search_name) VALUES (%s, %s)", (occupation.name, occupation.search_name))
+            cursor.execute("Insert into occupations (name, search_name) VALUES (%s, %s)", (occupation.name,
+                                                                                           occupation.search_name))
             print("Inserting occupation     : " + str(occupation))
         except psycopg2.IntegrityError:
             print("Already inserted   : " + str(occupation))
@@ -428,8 +435,8 @@ class DataSet:
     def save_employer(self, employer, cursor):
         try:
             cursor.execute("Insert into employers (name, street_no, street_name, city, state) VALUES  "
-                           "( %s, %s, %s, %s, %s)", (employer.name, employer.street_no, employer.street_name, employer.city,
-                                                     employer.state))
+                           "( %s, %s, %s, %s, %s)", (employer.name, employer.street_no, employer.street_name,
+                                                     employer.city, employer.state))
             print("Inserting employer     : " + str(employer))
         except psycopg2.IntegrityError:
             print("Already inserted   : " + str(employer))
@@ -444,7 +451,8 @@ class DataSet:
             intermediary.employer = 'None'
 
         try:
-            cursor.execute("INSERT INTO intermediaries (name, street_no, street_name, apartment, city, state, zip_code, occupation, occupation_id, employer, employer_id, name_code) VALUES  "
+            cursor.execute("INSERT INTO intermediaries (name, street_no, street_name, apartment, city, state, zip_code, "
+                           "occupation, occupation_id, employer, employer_id, name_code) VALUES  "
                            "( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                            (intermediary.name, intermediary.street_no, intermediary.street_name, intermediary.apartment,
                             intermediary.city, intermediary.state, intermediary.zip_code, intermediary.occupation,
@@ -464,7 +472,9 @@ class DataSet:
             contributor.employer = 'None'
 
         try:
-            cursor.execute("INSERT INTO contributors (name, c_code, c_type, street_no, street_name, apartment, borough_code, city, state, zip_code, occupation, occupation_id, employer, employer_id) VALUES  "
+            cursor.execute("INSERT INTO contributors (name, c_code, c_type, street_no, street_name, apartment, "
+                           "borough_code, city, state, zip_code, occupation, occupation_id, employer, "
+                           "employer_id) VALUES  "
                            "( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                             (contributor.name, contributor.c_code, contributor.c_type, contributor.street_no,
                              contributor.street_name, contributor.apartment, contributor.borough_code, contributor.city,
@@ -512,8 +522,12 @@ class DataSet:
         return result
 
     def fetch_occupation_by_name(self, name, cursor):
-        cursor.execute("select * from fetch_occupation_by_name(%s)", [name])
-        result = cursor.fetchone()
+        try:
+            cursor.execute("select * from fetch_occupation_by_name(%s)", [name])
+            result = cursor.fetchone()
+        except psycopg2.InternalError:
+            result = None
+        self.db.open_cursor()
         return result
 
     def fetch_employer_by_name(self, name, cursor):
@@ -529,8 +543,13 @@ class DataSet:
     def fetch_intermediary_by_name_zip_occupation_id(self, name, zip_code, occupation_id, cursor):
         if occupation_id == -1 or occupation_id == 0 or occupation_id is None:
             occupation_id = 299
-        cursor.execute("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
-        result = cursor.fetchone()
+        # print("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
+        try:
+            cursor.execute("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
+            result = cursor.fetchone()
+        except psycopg2.InternalError:
+            result = None
+        self.db.open_cursor()
         return result
 
     def fetch_contributor_by_name_zip_c_code_occupation(self, contributor, cursor):
@@ -538,11 +557,15 @@ class DataSet:
             contributor.occupation_id = 299
         if contributor.employer_id == -1 or contributor.employer_id == 0 or contributor.employer_id is None:
             contributor.employer_id = 50
-        print("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
-              (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
-        cursor.execute("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
-                       (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
-        result = cursor.fetchone()
+        # print("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
+        #       (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
+        try:
+            cursor.execute("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
+                           (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
+            result = cursor.fetchone()
+        except psycopg2.InternalError:
+            result = None
+        self.db.open_cursor()
         return result
 
 
@@ -552,10 +575,9 @@ def load_files(file_names):
         print(file)
         fr = FileReader(file)
         fr.read_file()
-
-        ds2013 = DataSet()
         # x = 0
         for data in fr.raw_data:
+            ds2013 = DataSet()
             ds2013.set_all_data(data)
             ds2013.build_all()
             # x += 1
