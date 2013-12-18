@@ -40,7 +40,7 @@ var api = require('./lib/controllers/api'),
 // Server Routes
 app.get('/api/candidates', api.candidates);
 app.get('/api/offices', api.offices);
-app.get('/api/offices/:office_id?', api.candidatesByOffice);
+app.get('/api/offices/:officeId?', api.candidatesByOffice);
 
 
 // Angular Routes

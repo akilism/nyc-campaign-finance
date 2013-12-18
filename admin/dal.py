@@ -280,114 +280,115 @@ class DataSet:
         employer2_id = 0
         for line_data in self.all_data:
 
-            if line_data[4] is not '':
-                candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5],
-                                      line_data[6])
-                candidate_id = self.get_candidate_id(candidate, cursor)
+            # if line_data[4] is not '':
+                # candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5],
+                #                       line_data[6])
+                # candidate_id = self.get_candidate_id(candidate, cursor)
                 # print(str(candidate) + " : " + str(candidate_id) + " : " + str(candidate.candidate_id))
                 # if binary_search(self.data['candidates'], candidate, len(self.data['candidates'])-1, 0) is None:
                 #     self.data['candidates'].append(candidate)
                 #     self.save_candidate(candidate, cursor)
                 #     self.data['candidates'] = QuickSort(self.data['candidates']).items
             #
-            # if line_data[23] is not '':
+            added_employer = False
+            if line_data[23] is not '':
             #     # Contributor Fields
-            #     employer = Employer(line_data[23], line_data[24], line_data[25], line_data[26], line_data[27])
-
-            # if line_data[40] is not '':
-            #     # Intermediary Fields
-            #     employer2 = Employer(line_data[40], line_data[41], line_data[42], line_data[43], line_data[44])
+                employer = Employer(line_data[23], line_data[24], line_data[25], line_data[26], line_data[27])
                 # if binary_search(self.data['employers'], employer, len(self.data['employers'])-1, 0) is None:
                 #     self.data['employers'].append(employer)
                 #     self.save_employer(employer, cursor)
-                #     self.data['employers'] = QuickSort(self.data['employers']).items
+                #     added_employer = True
+            #
+            # if line_data[40] is not '':
+            # #     # Intermediary Fields
+            #     employer2 = Employer(line_data[40], line_data[41], line_data[42], line_data[43], line_data[44])
+            #     # self.data['employers'].append(employer2)
+            #     # self.save_employer(employer2, cursor)
+            #     # added_employer = True
+
+            # if added_employer:
+            #     self.data['employers'] = QuickSort(self.data['employers']).items
 
             # added_occupation = False
             if line_data[22] is not '':
                 occupation = Occupation(line_data[22].title())
-            #     if binary_search(self.data['occupations'], occupation, len(self.data['occupations'])-1, 0) is None:
-            #         self.data['occupations'].append(occupation)
-            #         self.save_occupation(occupation, cursor)
-            #         added_occupation = True
+                # if binary_search(self.data['occupations'], occupation, len(self.data['occupations'])-1, 0) is None:
+                #     self.data['occupations'].append(occupation)
+                #     self.save_occupation(occupation, cursor)
+                #     added_occupation = True
             #
             # if not line_data[22].title() != line_data[45].title():
-            if line_data[45] is not '':
-                occupation2 = Occupation(line_data[45].title())
-                # if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
-                #     self.data['occupations'].append(occupation2)
-                #     self.save_occupation(occupation2, cursor)
-                #     added_occupation = True
-
-            # if added_occupation:
-            #     self.data['occupations'] = QuickSort(self.data['occupations']).items
+            # if line_data[45] is not '':
+            #     occupation2 = Occupation(line_data[45].title())
+            #     # if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
+            #     #     self.data['occupations'].append(occupation2)
+            #     #     self.save_occupation(occupation2, cursor)
+            #     #     added_occupation = True
             #
-            if line_data[33] is not '':
-                occupation2_id = -1
-                if occupation2 is not None:
-                    occupation2_id = self.get_occupation_id(occupation2, cursor)
-                    cursor = self.db.get_cursor()
-
-                employer2_id = -1
-                if employer2 is not None:
-                    employer2_id = self.get_employer_id(employer2, cursor)
-
-                intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35],
-                                            line_data[36], line_data[37], line_data[38], line_data[39], occupation2_id,
-                                            employer2_id, line_data[51])
+            # # if added_occupation:
+            # #     self.data['occupations'] = QuickSort(self.data['occupations']).items
+            # #
+            # if line_data[33] is not '':
+            #     occupation2_id = -1
+            #     if occupation2 is not None:
+            #         occupation2_id = self.get_occupation_id(occupation2, cursor)
+            #
+            #     employer2_id = -1
+            #     if employer2 is not None:
+            #         employer2_id = self.get_employer_id(employer2, cursor)
+            #
+            #     intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35],
+            #                                 line_data[36], line_data[37], line_data[38], line_data[39], occupation2_id,
+            #                                 employer2_id, line_data[51])
             #     if binary_search(self.data['intermediaries'], intermediary, len(self.data['intermediaries'])-1, 0) is None:
-            #         if employer2_id != -1:
-            #             intermediary.employer = employer2.name
-            #         if occupation2_id != -1:
-            #             intermediary.occupation = occupation2.name
-            #
             #         self.data['intermediaries'].append(intermediary)
+            #         if employer2 is not None:
+            #             intermediary.employer = employer2.name
+            #         if occupation2 is not None:
+            #             intermediary.occupation = occupation2.name
             #         self.save_intermediary(intermediary, cursor)
             #         self.data['intermediaries'] = QuickSort(self.data['intermediaries']).items
 
-            contributor_id = 0
+            # contributor_id = 0
             if line_data[13] is not '':
                 occupation_id = -1
                 if occupation is not None:
                     occupation_id = self.get_occupation_id(occupation, cursor)
-                    cursor = self.db.get_cursor()
-                #
-                # employer_id = -1
-                # if employer is not None:
-                #     employer_id = self.get_employer_id(employer, cursor)
+
+                employer_id = -1
+                if employer is not None:
+                    employer_id = self.get_employer_id(employer, cursor)
                 contributor = Contributor(line_data[13], line_data[14], line_data[15], line_data[16], line_data[17],
-                                          line_data[18], line_data[19], line_data[20], line_data[21], 0, 0)
-                if contributor is not None:
-                    contributor.occupation_id = occupation_id
-                    contributor_id = self.get_contributor_id(contributor, cursor)
-                    cursor = self.db.get_cursor()
-                    # print(str(contributor) + " : " + str(contributor_id) + " : " + str(contributor.contributor_id))
-                # contributor.occupation_id = occupation_id
-                # contributor.employer_id = employer_id
-                # if self.fetch_contributor_by_name_zip_c_code_occupation(contributor, cursor) is None:
+                                          line_data[18], line_data[19], line_data[20], line_data[21], employer_id,
+                                          occupation_id)
+                if self.fetch_contributor_by_name_zip_c_code_occupation(contributor, cursor) is None:
+                    if employer is not None:
+                        contributor.employer = employer.name
+                    if occupation is not None:
+                        contributor.occupation = occupation.name
             #     #if binary_search(self.data['contributors'], contributor, len(self.data['contributors'])-1, 0) is None:
             #         # self.data['contributors'].append(contributor)
-            #         self.save_contributor(contributor, cursor)
+                    self.save_contributor(contributor, cursor)
             #         # self.data['contributors'] = QuickSort(self.data['contributors']).items
             #
             # #TODO setup database to save these then fill in based on value in csv
 
-            intermediary_id = 0
-            if intermediary is not None:
-                intermediary.occupation_id = occupation2_id
-                intermediary_id = self.get_intermediary_id(intermediary, cursor)
-                cursor = self.db.get_cursor()
-                # print(str(intermediary) + " : " + str(intermediary_id) + " : " + str(intermediary.intermediary_id))
+            # intermediary_id = 0
+            # if intermediary is not None:
+            #     intermediary.occupation_id = occupation2_id
+            #     intermediary_id = self.get_intermediary_id(intermediary, cursor)
+            #     # print(str(intermediary) + " : " + str(intermediary_id) + " : " + str(intermediary.intermediary_id))
+            # #
+            # # print("candidate: " + str(candidate_id))
+            # # print("contributor: " + str(contributor_id))
+            # # print("intermediary: " + str(intermediary_id))
             #
-            # print("candidate: " + str(candidate_id))
-            # print("contributor: " + str(contributor_id))
-            # print("intermediary: " + str(intermediary_id))
-
-            contribution = Contribution(candidate_id, contributor_id, intermediary_id, line_data[7], line_data[8],
-                                        line_data[9], line_data[10], line_data[11], line_data[12], line_data[28],
-                                        line_data[29], line_data[30], line_data[31], line_data[46], line_data[47],
-                                        line_data[48], line_data[49], line_data[50], line_data[0])
-            if int(contributor_id) != 0:
-                self.save_contribution(contribution, cursor)
+            # contribution = Contribution(candidate_id, contributor_id, intermediary_id, line_data[7], line_data[8],
+            #                             line_data[9], line_data[10], line_data[11], line_data[12], line_data[28],
+            #                             line_data[29], line_data[30], line_data[31], line_data[46], line_data[47],
+            #                             line_data[48], line_data[49], line_data[50], line_data[0])
+            # if int(contributor_id) != 0:
+            #     self.save_contribution(contribution, cursor)
             # print(contribution)
             # self.data['contributions'].append(contribution)
 
@@ -443,11 +444,11 @@ class DataSet:
         self.db.commit_changes()
 
     def save_intermediary(self, intermediary, cursor):
-        if intermediary.occupation_id == -1 or intermediary.occupation_id == 0 or intermediary.occupation_id is None:
-            intermediary.occupation_id = 299
+        if intermediary.occupation_id == -1 or intermediary.occupation_id == 0:
+            intermediary.occupation_id = 844
             intermediary.occupation = 'None'
         if intermediary.employer_id == -1 or intermediary.employer_id == 0 or intermediary.employer_id is None:
-            intermediary.employer_id = 50
+            intermediary.employer_id = 71
             intermediary.employer = 'None'
 
         try:
@@ -465,10 +466,10 @@ class DataSet:
 
     def save_contributor(self, contributor, cursor):
         if contributor.occupation_id == -1 or contributor.occupation_id == 0 or contributor.occupation_id is None:
-            contributor.occupation_id = 299
+            contributor.occupation_id = 844
             contributor.occupation = 'None'
         if contributor.employer_id == -1 or contributor.employer_id == 0 or contributor.employer_id is None:
-            contributor.employer_id = 50
+            contributor.employer_id = 71
             contributor.employer = 'None'
 
         try:
@@ -522,12 +523,8 @@ class DataSet:
         return result
 
     def fetch_occupation_by_name(self, name, cursor):
-        try:
-            cursor.execute("select * from fetch_occupation_by_name(%s)", [name])
-            result = cursor.fetchone()
-        except psycopg2.InternalError:
-            result = None
-        self.db.open_cursor()
+        cursor.execute("select * from fetch_occupation_by_name(%s)", [name])
+        result = cursor.fetchone()
         return result
 
     def fetch_employer_by_name(self, name, cursor):
@@ -542,30 +539,23 @@ class DataSet:
 
     def fetch_intermediary_by_name_zip_occupation_id(self, name, zip_code, occupation_id, cursor):
         if occupation_id == -1 or occupation_id == 0 or occupation_id is None:
-            occupation_id = 299
+            occupation_id = 844
         # print("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
-        try:
-            cursor.execute("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
-            result = cursor.fetchone()
-        except psycopg2.InternalError:
-            result = None
-        self.db.open_cursor()
+        cursor.execute("select * from fetch_intermediary_by_name_zip_occupation_id(%s, %s, %s)", (name, zip_code, occupation_id))
+        result = cursor.fetchone()
+
         return result
 
     def fetch_contributor_by_name_zip_c_code_occupation(self, contributor, cursor):
         if contributor.occupation_id == -1 or contributor.occupation_id == 0 or contributor.occupation_id is None:
-            contributor.occupation_id = 299
+            contributor.occupation_id = 844
         if contributor.employer_id == -1 or contributor.employer_id == 0 or contributor.employer_id is None:
-            contributor.employer_id = 50
+            contributor.employer_id = 71
         # print("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
         #       (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
-        try:
-            cursor.execute("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
-                           (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
-            result = cursor.fetchone()
-        except psycopg2.InternalError:
-            result = None
-        self.db.open_cursor()
+        cursor.execute("select * from fetch_contributor_by_name_zip_c_code_occupation(%s, %s, %s, %s)",
+                      (contributor.name, contributor.c_code, contributor.zip_code, contributor.occupation_id))
+        result = cursor.fetchone()
         return result
 
 
@@ -576,8 +566,8 @@ def load_files(file_names):
         fr = FileReader(file)
         fr.read_file()
         # x = 0
+        ds2013 = DataSet()
         for data in fr.raw_data:
-            ds2013 = DataSet()
             ds2013.set_all_data(data)
             ds2013.build_all()
             # x += 1

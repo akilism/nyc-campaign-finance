@@ -1,11 +1,11 @@
 'use strict';
 
-var nycCampaignFinanceApp = angular.module('nycCampaignFinanceApp', [
+var nycCampaignFinanceApp = angular.module('NYCCampFi', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'campFiControllers'
+  'NYCCampFi.controllers'
 ]);
 
 nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
@@ -18,7 +18,7 @@ nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
         templateUrl: 'partials/office_list.html',
         controller: 'OfficeListCtrl'
       })
-      .when('/office/:office_id', {
+      .when('/office/:officeId', {
         templateUrl: 'partials/candidate_list.html',
         controller: 'OfficeCandidateListCtrl'
       })

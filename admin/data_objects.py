@@ -146,7 +146,7 @@ class Contributor:
         self.borough_code = borough_code
         self.city = city
         self.state = state
-        self.zip_code = zip_code
+        self.zip_code = zip_code.strip(' \t\n\r').lower()
         self.employer_id = employer_id
         self.employer = ''
         self.occupation_id = occupation_id
@@ -199,13 +199,13 @@ class Contributor:
             return 1
         if self.name.lower() < other.name.lower():
             return -1
-        if self.street_name.lower() > other.street_name.lower():
+        if self.occupation_id > other.occupation_id:
             return 1
-        if self.street_name.lower() < other.street_name.lower():
+        if self.occupation_id < other.occupation_id:
             return -1
-        if self.street_no > other.street_no:
+        if self.zip_code > other.zip_code:
             return 1
-        if self.street_no < other.street_no:
+        if self.zip_code < other.zip_code:
             return -1
         return 0
 
@@ -258,7 +258,7 @@ class Intermediary:
         self.apartment = apartment
         self.city = city
         self.state = state
-        self.zip_code = zip_code
+        self.zip_code = zip_code.lower()
         self.occupation_id = occupation_id
         self.occupation = ''
         self.employer_id = employer_id
@@ -283,14 +283,14 @@ class Intermediary:
             return 1
         if self.name.lower() < other.name.lower():
             return -1
-        if self.street_name.lower() > other.street_name.lower():
+        if self.occupation_id > other.occupation_id:
             return 1
-        if self.street_name.lower() < other.street_name.lower():
+        if self.occupation_id < other.occupation_id:
             return -1
-        if self.street_no.lower() > other.street_no.lower():
-            return 1
-        if self.street_no.lower() < other.street_no.lower():
-            return -1
+        # if self.zip_code > other.zip_code:
+        #     return 1
+        # if self.zip_code < other.zip_code:
+        #     return -1
         return 0
 
 

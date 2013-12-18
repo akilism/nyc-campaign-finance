@@ -15,9 +15,9 @@ exports.offices = function (req, res) {
 };
 
 exports.candidatesByOffice = function(req, res) {
-    var route_params = req.route.params;
+    var routeParams = req.route.params;
 //    console.log(route_params);
-    data_access.dataConnection.fetchCandidatesByOffice(route_params['office_id'], function(result) {
+    data_access.dataConnection.fetchCandidatesByOffice(routeParams['officeId'], function(result) {
         res.send(result.rows);
     });
 };
