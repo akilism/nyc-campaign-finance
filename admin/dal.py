@@ -108,7 +108,7 @@ class DataSet:
             'occupations': False
         }
         self.quick_sort = None
-        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', '12345', '192.168.1.56', '5432')
+        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', '12345', 'localhost', '5432')
 
     def set_all_data(self, all_data):
         self.all_data = all_data
@@ -163,7 +163,7 @@ class DataSet:
         # self.save_employer(employer, cursor)
 
         # Intermediary Fields
-        if line_data[40] is not '':
+        if len(line_data) >= 40 and line_data[40] is not '':
             employer2 = Employer(line_data[40], line_data[41], line_data[42], line_data[43], line_data[44])
             employer2.employer_id = self.get_employer_id(employer2, cursor)
             if self.distinct['employers']:
@@ -188,7 +188,9 @@ class DataSet:
     def build_occupations(self, line_data, cursor):
         added_occupation = False
         name1 = line_data[22].title()
-        name2 = line_data[45].title()
+        name2 = ""
+        if len(line_data) >= 45:
+            name2 = line_data[45].title()
         occupations = []
         occupation = Occupation(name1)
         occupation.occupation_id = self.get_occupation_id(occupation, cursor)
