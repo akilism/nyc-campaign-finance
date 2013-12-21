@@ -3,6 +3,7 @@ __author__ = 'akil.harris'
 import datetime
 from decimal import *
 
+
 class Candidate:
 
     def __init__(self, raw_name, office_id, cfb_id, canclass, committee, filing, candidate_id=0):
@@ -69,29 +70,30 @@ class Candidate:
 class Contribution:
 
     def __init__(self, candidate_id, contributor_id, intermediary_id, schedule, pageno, seqno, refno, date, refdate, amount, match_amount, prev_total, payment_method_id, purpose_code_id, exempt_code_id, adjustment_type_code_id, is_runoff, is_segregated, election_cycle, contribution_id=0):
-        self.schedule = schedule
-        self.pageno = pageno
-        self.seqno = seqno
-        self.refno = refno
+        self.schedule = check_value(schedule)
+        self.pageno = check_value(pageno)
+        self.seqno = check_value(seqno)
+        self.refno = check_value(refno)
         self.date = get_date(date)
         self.refdate = get_date(refdate)
+        if amount is None:
+            amount = 0
         self.amount = Decimal(amount)
         self.match_amount = Decimal(match_amount)
         self.prev_total = Decimal(prev_total)
         self.payment_method_id = int(payment_method_id)
         self.payment_method = self.get_payment_method()
         self.purpose_code_id = purpose_code_id
-        print(self.purpose_code_id)
         self.purpose_code = self.get_purpose_code()
         self.exempt_code_id = exempt_code_id
         self.adjustment_type_code_id = adjustment_type_code_id
         self.is_runoff = to_bool(is_runoff)
         self.is_segregated = to_bool(is_segregated)
-        self.candidate_id = candidate_id
-        self.contributor_id = contributor_id
-        self.intermediary_id = intermediary_id
+        self.candidate_id = check_value(candidate_id)
+        self.contributor_id = check_value(contributor_id)
+        self.intermediary_id = check_value(intermediary_id)
         self.election_cycle = election_cycle
-        self.contribution_id = contribution_id
+        self.contribution_id = check_value(contribution_id)
 
     def get_payment_method(self):
         if self.payment_method_id == 1 or self.payment_method_id == 0:
@@ -104,6 +106,7 @@ class Contribution:
             return 'Credit Card'
         elif self.payment_method_id == 5:
             return 'Money Order'
+        return 'NULL'
 
     def get_purpose_code(self):
         if self.purpose_code_id == 'ADVAN':
@@ -118,6 +121,7 @@ class Contribution:
             return 'Compliance Cost'
         elif self.purpose_code_id == 'CONSL':
             return 'Campaign Consultants'
+        return 'NULL'
 
     def __str__(self):
         return str(self.amount) + ' from ' + str(self.contributor_id) + ' to ' + str(self.candidate_id)
@@ -214,6 +218,7 @@ class Employer:
 
     def __init__(self, name, street_no, street_name, city, state, employer_id=0):
         self.name = name.strip(' \t\n\r')
+        self.name = self.name.replace(',', '')
         self.street_no = street_no
         self.street_name = street_name
         self.city = city
@@ -298,6 +303,7 @@ class Occupation:
 
     def __init__(self, name, occupation_id=0):
         self.name = name.strip(' \t\n\r')
+        self.name = self.name.replace(',', '')
         self.occupation_id = occupation_id
         self.search_name = self.get_search_name()
 
@@ -353,7 +359,7 @@ def get_date(date_str):
     '6/30/2008'
     if len(parts) >= 3:
         return datetime.date(int(parts[2]), int(parts[0]), int(parts[1]))
-    return None
+    return 'NULL'
 
 
 def to_bool(value):
@@ -362,4 +368,12 @@ def to_bool(value):
         return False
     elif value == 'y':
         return True
+    else:
+        return 'NULL'
+
+
+def check_value(value):
+    if value is None:
+        return 'NULL'
+    return value
 

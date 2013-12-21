@@ -20,3 +20,15 @@ WITH (
 ;
 COMMENT ON TABLE public.intermediaries
   IS 'Intermediaries of contributors and candidates.';
+
+
+
+
+COPY
+intermediaries
+  (name, street_no, street_name, apartment, city, state, zip_code, occupation, occupation_id, employer, employer_id, name_code)
+from
+  'C:\Users\akil.harris\repos\nyc_campaign_finanace\data_files\0_intermediaries_19_12_2013_192242.csv'
+DELIMITER ','
+NULL 'NULL'
+CSV;

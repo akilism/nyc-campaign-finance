@@ -2,15 +2,13 @@ __author__ = 'akil.harris'
 
 import csv
 import argparse
-
+import json
 import psycopg2
 
 from admin.data_objects import *
 from admin.data_structures import *
 
-
 LINES_PER_BATCH = 500
-
 
 class FileReader:
 
@@ -93,8 +91,24 @@ class DataSet:
             'intermediaries': [],
             'occupations': []
         }
+        self.data2 = {
+            'candidates': set(),
+            'contributors': set(),
+            'employers': set(),
+            'contributions': set(),
+            'intermediaries': set(),
+            'occupations': set()
+        }
+        self.distinct = {
+            'candidates': False,
+            'contributors': False,
+            'employers': False,
+            'contributions': False,
+            'intermediaries': False,
+            'occupations': False
+        }
         self.quick_sort = None
-        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', '12345', 'localhost', '5432')
+        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', '12345', '192.168.1.56', '5432')
 
     def set_all_data(self, all_data):
         self.all_data = all_data
@@ -102,166 +116,193 @@ class DataSet:
     def set_data(self, raw_data):
         self.raw_data = raw_data
 
-    def build_candidates(self):
-        for data in self.raw_data:
-            name = data[4]
-            office_id = data[1]
-            cfb_id = data[2]
-            canclass = data[3]
-            committee = data[5]
-            filing = data[6]
-            candidate = Candidate(name, office_id, cfb_id, canclass, committee, filing)
+    def set_distinct(self, cols):
+        for col in cols:
+            if col == 'candidates':
+                self.distinct['candidates'] = True
+            elif col == 'contributors':
+                self.distinct['contributors'] = True
+            elif col == 'employers':
+                self.distinct['employers'] = True
+            elif col == 'contributions':
+                self.distinct['contributions'] = True
+            elif col == 'intermediaries':
+                self.distinct['intermediaries'] = True
+            elif col == 'occupations':
+                self.distinct['occupations'] = True
 
-            if self.candidate_missing(candidate):
+    def build_candidates(self, line_data):
+        candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5],
+                              line_data[6])
+
+        if self.distinct['candidates']:
+            if binary_search(self.data['candidates'], candidate, len(self.data['candidates'])-1, 0) is None:
                 self.data['candidates'].append(candidate)
-
-    def candidate_missing(self, candidate):
-        for stored_candidate in self.data['candidates']:
-            if stored_candidate.cfb_id == candidate.cfb_id:
-                return False
-        return True
+                self.data['candidates'] = QuickSort(self.data['candidates']).items
+                print(candidate)
+        return candidate
 
     def print_candidates(self):
         for candidate in self.data['candidates']:
             print(candidate)
 
-    def build_employers(self):
-        for data in self.raw_data:
-            name = data[23]
-            street_no = data[24]
-            street_name = data[25]
-            city = data[26]
-            state = data[27]
-            employer = Employer(name, street_no, street_name, city, state)
-            if self.missing_employer(employer):
+    def build_employers(self, line_data, cursor):
+        employers = []
+        added_employer = False
+
+        # Contributor Fields
+        employer = Employer(line_data[23], line_data[24], line_data[25], line_data[26], line_data[27])
+        employer.employer_id = self.get_employer_id(employer, cursor)
+        if self.distinct['employers']:
+            if binary_search(self.data['employers'], employer, len(self.data['employers'])-1, 0) is None:
+                added_employer = True
+                print(employer)
                 self.data['employers'].append(employer)
 
-    def missing_employer(self, employer):
-        for stored_employer in self.data['employers']:
-            if stored_employer.is_self(employer):
-                return False
-        return True
+        employers.append(employer)
+        # self.save_employer(employer, cursor)
+
+        # Intermediary Fields
+        if line_data[40] is not '':
+            employer2 = Employer(line_data[40], line_data[41], line_data[42], line_data[43], line_data[44])
+            employer2.employer_id = self.get_employer_id(employer2, cursor)
+            if self.distinct['employers']:
+                if binary_search(self.data['employers'], employer2, len(self.data['employers'])-1, 0) is None:
+                    added_employer = True
+                    print(employer2)
+                    self.data['employers'].append(employer2)
+            employers.append(employer2)
+            # self.save_employer(employer2, cursor)
+        else:
+            employers.append(None)
+
+        if added_employer:
+            self.data['employers'] = QuickSort(self.data['employers']).items
+
+        return employers
 
     def print_employers(self):
         for employer in self.data['employers']:
             print(employer)
 
-    def build_occupations(self):
-        for data in self.raw_data:
-            name1 = data[22].title()
-            name2 = data[45].title()
-            occupation = Occupation(name1)
-
-            if self.missing_occupation(occupation):
+    def build_occupations(self, line_data, cursor):
+        added_occupation = False
+        name1 = line_data[22].title()
+        name2 = line_data[45].title()
+        occupations = []
+        occupation = Occupation(name1)
+        occupation.occupation_id = self.get_occupation_id(occupation, cursor)
+        if self.distinct['occupations']:
+            if binary_search(self.data['occupations'], occupation, len(self.data['occupations'])-1, 0) is None:
+                added_occupation = True
+                print(occupation)
                 self.data['occupations'].append(occupation)
 
-            if name1 != name2:
-                occupation2 = Occupation(name2)
-                if self.missing_occupation(occupation2):
-                    self.data['occupations'].append(occupation2)
+        occupations.append(occupation)
+        # self.save_occupation(occupation, cursor)
 
-    def missing_occupation(self, occupation):
-        for stored_occupation in self.data['occupations']:
-            if stored_occupation.is_self(occupation):
-                return False
-        return True
+        if name1 != name2:
+            occupation2 = Occupation(name2)
+            occupation2.occupation_id = self.get_occupation_id(occupation2, cursor)
+            if self.distinct['occupations']:
+                if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
+                    added_occupation = True
+                    print(occupation2)
+                    self.data['occupations'].append(occupation2)
+            occupations.append(occupation2)
+            # self.save_occupation(occupation2, cursor)
+        elif name2 is not '':
+            occupations.append(occupation)
+        else:
+            occupations.append(None)
+
+        if added_occupation:
+            self.data['occupations'] = QuickSort(self.data['occupations']).items
+
+        return occupations
 
     def print_occupations(self):
         for occupation in self.data['occupations']:
             print(occupation)
 
-    def build_intermediaries(self):
-        for data in self.raw_data:
-            if data[33] != '':
-                number = data[32].title()
-                name = data[33]
-                street_no = data[34]
-                street_name = data[35]
-                apartment = data[36]
-                city = data[37]
-                state = data[38]
-                zip_code = data[39]
-                name_code = data[51]
-                #TODO setup database to save these then fill in based on value in csv
-                occupation_id = 0
-                employer_id = 0
-                intermediary = Intermediary(number, name, street_no, street_name, apartment, city, state, zip_code, occupation_id, employer_id, name_code)
+    def build_intermediaries(self, line_data, employer_id, occupation_id, employer, occupation):
 
-                if self.intermediary_missing(intermediary):
-                    self.data['intermediaries'].append(intermediary)
-
-    def intermediary_missing(self, intermediary):
-        for stored_intermediary in self.data['intermediaries']:
-            if stored_intermediary.is_self(intermediary):
-                return False
-        return True
+        number = line_data[32]
+        name = line_data[33].title()
+        street_no = line_data[34]
+        street_name = line_data[35]
+        apartment = line_data[36]
+        city = line_data[37]
+        state = line_data[38]
+        zip_code = line_data[39]
+        name_code = line_data[51]
+        intermediary = Intermediary(number, name, street_no, street_name, apartment, city, state, zip_code,
+                                    occupation_id, employer_id, name_code)
+        intermediary.employer = employer
+        intermediary.occupation = occupation
+        if self.distinct['intermediaries']:
+            if binary_search(self.data['intermediaries'], intermediary, len(self.data['intermediaries'])-1, 0) is None:
+                print("intermediary: " + str(intermediary))
+                self.data['intermediaries'].append(intermediary)
+                self.data['intermediaries'] = QuickSort(self.data['intermediaries']).items
+        return intermediary
 
     def print_intermediaries(self):
         for intermediary in self.data['intermediaries']:
             print(intermediary)
 
-    def build_contributors(self):
-        for data in self.raw_data:
-            if data[33] != '':
-                name = data[13]
-                c_code = data[14]
-                street_no = data[15]
-                street_name = data[16]
-                apartment = data[17]
-                borough_code = data[18]
-                city = data[19]
-                state = data[20]
-                zip_code = data[21]
-                #TODO setup database to save these then fill in based on value in csv
-                occupation_id = 0
-                employer_id = 0
-                contributor = Contributor(name, c_code, street_no, street_name, apartment, borough_code, city, state, zip_code, employer_id, occupation_id)
+    def build_contributors(self, line_data, employer_id, occupation_id, employer, occupation, cursor):
+        name = line_data[13]
+        c_code = line_data[14]
+        street_no = line_data[15]
+        street_name = line_data[16]
+        apartment = line_data[17]
+        borough_code = line_data[18]
+        city = line_data[19]
+        state = line_data[20]
+        zip_code = line_data[21]
+        contributor = Contributor(name, c_code, street_no, street_name, apartment, borough_code, city, state, zip_code, employer_id, occupation_id)
+        contributor.employer = employer
+        contributor.occupation = occupation
 
-                if self.contributor_missing(contributor):
-                    self.data['contributors'].append(contributor)
-
-    def contributor_missing(self, contributor):
-        for stored_contributor in self.data['contributors']:
-            if stored_contributor.is_self(contributor):
-                return False
-        return True
+        if self.distinct['contributors']:
+            # if binary_search(self.data['contributors'], contributor, len(self.data['contributors'])-1, 0) is None:
+            if self.fetch_contributor_by_name_zip_c_code_occupation(contributor, cursor) is None:
+                self.data['contributors'].append(contributor)
+                print(contributor)
+                self.save_contributor(contributor, cursor)
+                # self.data['contributors'] = QuickSort(self.data['contributors']).items
+        return contributor
 
     def print_contributors(self):
         for contributor in self.data['contributors']:
             print(contributor)
 
-    def build_contributions(self):
-        for data in self.raw_data:
-            schedule = data[7]
-            pageno = data[8]
-            seqno = data[9]
-            refno = data[10]
-            date = data[11]
-            refdate = data[12]
-            amount = data[28]
-            match_amount = data[29]
-            prev_total = data[30]
-            payment_method_id = data[31]
-            purpose_code_id = data[46]
-            exempt_code_id = data[47]
-            adjustment_type_code_id = data[48]
-            is_runoff = data[49]
-            is_segregated = data[50]
-            election_cycle = data[0]
-            #TODO setup database to save these then fill in based on value in csv
-            candidate_id = 0
-            contributor_id = 0
-            intermediary_id = 0
-            contribution = Contribution(candidate_id, contributor_id, intermediary_id, schedule, pageno, seqno, refno, date, refdate, amount, match_amount, prev_total, payment_method_id, purpose_code_id, exempt_code_id, adjustment_type_code_id, is_runoff, is_segregated, election_cycle)
+    def build_contributions(self, line_data, candidate_id, contributor_id, intermediary_id):
+            schedule = line_data[7]
+            pageno = line_data[8]
+            seqno = line_data[9]
+            refno = line_data[10]
+            date = line_data[11]
+            refdate = line_data[12]
+            amount = line_data[28]
+            match_amount = line_data[29]
+            prev_total = line_data[30]
+            payment_method_id = line_data[31]
+            purpose_code_id = line_data[46]
+            exempt_code_id = line_data[47]
+            adjustment_type_code_id = line_data[48]
+            is_runoff = line_data[49]
+            is_segregated = line_data[50]
+            election_cycle = line_data[0]
 
-            #if self.contribution_missing(contribution):
+            contribution = Contribution(candidate_id, contributor_id, intermediary_id, schedule, pageno,
+                                        seqno, refno, date, refdate, amount, match_amount, prev_total,
+                                        payment_method_id, purpose_code_id, exempt_code_id,
+                                        adjustment_type_code_id, is_runoff, is_segregated, election_cycle)
+
             self.data['contributions'].append(contribution)
-
-    def contribution_missing(self, contribution):
-        for stored_contribution in self.data['contributions']:
-            if stored_contribution.is_self(contribution):
-                return False
-        return True
+            return contribution
 
     def print_contributions(self):
         for contribution in self.data['contributions']:
@@ -269,128 +310,252 @@ class DataSet:
 
     def build_all(self):
         cursor = self.db.get_cursor()
-        occupation = None
-        occupation2 = None
-        employer = None
-        employer2 = None
+        intermediary_occupation_id = -1
+        intermediary_employer_id = -1
+        contributor_employer_id = -1
+        contributor_occupation_id = -1
+        intermediary_employer = None
+        intermediary_occupation = None
+        contributor_employer = None
+        contributor_occupation = None
+
         intermediary = None
-        occupation_id = 0
-        occupation2_id = 0
-        employer_id = 0
-        employer2_id = 0
+        candidate = None
+        contributor = None
+        employers = []
+        occupations = []
+        x = 0
         for line_data in self.all_data:
 
             # if line_data[4] is not '':
-                # candidate = Candidate(line_data[4], line_data[1], line_data[2], line_data[3], line_data[5],
-                #                       line_data[6])
-                # candidate_id = self.get_candidate_id(candidate, cursor)
-                # print(str(candidate) + " : " + str(candidate_id) + " : " + str(candidate.candidate_id))
-                # if binary_search(self.data['candidates'], candidate, len(self.data['candidates'])-1, 0) is None:
-                #     self.data['candidates'].append(candidate)
-                #     self.save_candidate(candidate, cursor)
-                #     self.data['candidates'] = QuickSort(self.data['candidates']).items
-            #
-            added_employer = False
+            #     candidate = self.build_candidates(line_data)
+
             if line_data[23] is not '':
-            #     # Contributor Fields
-                employer = Employer(line_data[23], line_data[24], line_data[25], line_data[26], line_data[27])
-                # if binary_search(self.data['employers'], employer, len(self.data['employers'])-1, 0) is None:
-                #     self.data['employers'].append(employer)
-                #     self.save_employer(employer, cursor)
-                #     added_employer = True
-            #
-            # if line_data[40] is not '':
-            # #     # Intermediary Fields
-            #     employer2 = Employer(line_data[40], line_data[41], line_data[42], line_data[43], line_data[44])
-            #     # self.data['employers'].append(employer2)
-            #     # self.save_employer(employer2, cursor)
-            #     # added_employer = True
+                employers = self.build_employers(line_data, cursor)
 
-            # if added_employer:
-            #     self.data['employers'] = QuickSort(self.data['employers']).items
-
-            # added_occupation = False
             if line_data[22] is not '':
-                occupation = Occupation(line_data[22].title())
-                # if binary_search(self.data['occupations'], occupation, len(self.data['occupations'])-1, 0) is None:
-                #     self.data['occupations'].append(occupation)
-                #     self.save_occupation(occupation, cursor)
-                #     added_occupation = True
-            #
-            # if not line_data[22].title() != line_data[45].title():
-            # if line_data[45] is not '':
-            #     occupation2 = Occupation(line_data[45].title())
-            #     # if binary_search(self.data['occupations'], occupation2, len(self.data['occupations'])-1, 0) is None:
-            #     #     self.data['occupations'].append(occupation2)
-            #     #     self.save_occupation(occupation2, cursor)
-            #     #     added_occupation = True
-            #
-            # # if added_occupation:
-            # #     self.data['occupations'] = QuickSort(self.data['occupations']).items
-            # #
+                occupations = self.build_occupations(line_data, cursor)
+
             # if line_data[33] is not '':
-            #     occupation2_id = -1
-            #     if occupation2 is not None:
-            #         occupation2_id = self.get_occupation_id(occupation2, cursor)
-            #
-            #     employer2_id = -1
-            #     if employer2 is not None:
-            #         employer2_id = self.get_employer_id(employer2, cursor)
-            #
-            #     intermediary = Intermediary(line_data[32].title(), line_data[33], line_data[34], line_data[35],
-            #                                 line_data[36], line_data[37], line_data[38], line_data[39], occupation2_id,
-            #                                 employer2_id, line_data[51])
-            #     if binary_search(self.data['intermediaries'], intermediary, len(self.data['intermediaries'])-1, 0) is None:
-            #         self.data['intermediaries'].append(intermediary)
-            #         if employer2 is not None:
-            #             intermediary.employer = employer2.name
-            #         if occupation2 is not None:
-            #             intermediary.occupation = occupation2.name
-            #         self.save_intermediary(intermediary, cursor)
-            #         self.data['intermediaries'] = QuickSort(self.data['intermediaries']).items
+            #     if len(employers) > 1 and employers[1] is not None:
+            #         intermediary_employer_id = employers[1].employer_id
+            #         intermediary_employer = employers[1].name
+            #     if len(occupations) > 1 and occupations[1] is not None:
+            #         intermediary_occupation_id = occupations[1].occupation_id
+            #         intermediary_occupation = occupations[1].name
+            #     intermediary = self.build_intermediaries(line_data,
+            #                                              intermediary_employer_id, intermediary_occupation_id,
+            #                                              intermediary_employer, intermediary_occupation)
 
-            # contributor_id = 0
             if line_data[13] is not '':
-                occupation_id = -1
-                if occupation is not None:
-                    occupation_id = self.get_occupation_id(occupation, cursor)
+                if len(employers) > 0 and employers[0] is not None:
+                    contributor_employer_id = employers[0].employer_id
+                    contributor_employer = employers[0].name
+                if len(occupations) > 0 and occupations[0] is not None:
+                    contributor_occupation_id = occupations[0].occupation_id
+                    contributor_occupation = occupations[0].name
+                contributor = self.build_contributors(line_data, contributor_employer_id, contributor_occupation_id,
+                                                      contributor_employer, contributor_occupation, cursor)
 
-                employer_id = -1
-                if employer is not None:
-                    employer_id = self.get_employer_id(employer, cursor)
-                contributor = Contributor(line_data[13], line_data[14], line_data[15], line_data[16], line_data[17],
-                                          line_data[18], line_data[19], line_data[20], line_data[21], employer_id,
-                                          occupation_id)
-                if self.fetch_contributor_by_name_zip_c_code_occupation(contributor, cursor) is None:
-                    if employer is not None:
-                        contributor.employer = employer.name
-                    if occupation is not None:
-                        contributor.occupation = occupation.name
-            #     #if binary_search(self.data['contributors'], contributor, len(self.data['contributors'])-1, 0) is None:
-            #         # self.data['contributors'].append(contributor)
-                    self.save_contributor(contributor, cursor)
-            #         # self.data['contributors'] = QuickSort(self.data['contributors']).items
-            #
-            # #TODO setup database to save these then fill in based on value in csv
 
+            # # print("------------------------------------------------------------------------------------------")
             # intermediary_id = 0
             # if intermediary is not None:
-            #     intermediary.occupation_id = occupation2_id
             #     intermediary_id = self.get_intermediary_id(intermediary, cursor)
-            #     # print(str(intermediary) + " : " + str(intermediary_id) + " : " + str(intermediary.intermediary_id))
-            # #
-            # # print("candidate: " + str(candidate_id))
-            # # print("contributor: " + str(contributor_id))
-            # # print("intermediary: " + str(intermediary_id))
+            # #     print("intermediary: " + str(intermediary) + ":   " + str(intermediary_id))
             #
-            # contribution = Contribution(candidate_id, contributor_id, intermediary_id, line_data[7], line_data[8],
-            #                             line_data[9], line_data[10], line_data[11], line_data[12], line_data[28],
-            #                             line_data[29], line_data[30], line_data[31], line_data[46], line_data[47],
-            #                             line_data[48], line_data[49], line_data[50], line_data[0])
-            # if int(contributor_id) != 0:
-            #     self.save_contribution(contribution, cursor)
-            # print(contribution)
-            # self.data['contributions'].append(contribution)
+            # candidate_id = 0
+            # if candidate is not None:
+            #     candidate_id = self.get_candidate_id(candidate, cursor)
+            # #     print("candidate: " + str(candidate) + ":   " + str(candidate_id))
+            #
+            # contributor_id = 0
+            # if contributor is not None:
+            #     contributor_id = self.get_contributor_id(contributor, cursor)
+            # #     print("contributor: " + str(contributor) + ":   " + str(contributor_id))
+            #
+            # contribution = self.build_contributions(line_data, candidate_id, contributor_id, intermediary_id)
+            # print("contribution: " + str(contribution))
+            # print("------------------------------------------------------------------------------------------")
+            # print("")
+            # if x > 10:
+            #     break
+            # else:
+            #     x += 1
+
+    def save(self, types_to_save, file_id):
+        for save_type in types_to_save:
+            timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+            f = open('data_files/' + str(file_id) + '_' + save_type + '_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+            data = []
+            line = ''
+            objects = []
+
+            if save_type == 'candidates':
+                objects = self.data['candidates']
+            elif save_type == 'employers':
+                objects = self.data['employers']
+            elif save_type == 'occupations':
+                objects = self.data['occupations']
+            elif save_type == 'intermediaries':
+                objects = self.data['intermediaries']
+            elif save_type == 'contributors':
+                objects = self.data['contributors']
+            elif save_type == 'contributions':
+                objects = self.data['contributions']
+
+            for obj in objects:
+                if obj is None:
+                    continue
+
+                if save_type == 'candidates':
+                    print(obj)
+                    line = str(obj.office_id) + "," + obj.office + "," + obj.cfb_id + "," + obj.canclass + "," +\
+                           obj.committee + "," + obj.filing + "," + obj.name + "\n"
+                elif save_type == 'employers':
+                    line = obj.name + "," + obj.street_no + "," + obj.street_name + "," + obj.city + "," + \
+                           obj.state + "\n"
+                elif save_type == 'occupations':
+                    line = obj.name + "," + obj.search_name + "\n"
+                elif save_type == 'intermediaries':
+                    if obj.employer_id == -1:
+                        obj.employer_id = "NULL"
+                    if obj.employer is None:
+                        obj.employer = "NULL"
+                    if obj.occupation_id == -1:
+                        obj.occupation_id = "NULL"
+                    if obj.occupation is None:
+                        obj.occupation = "NULL"
+                    line = obj.name + "," + obj.street_no + "," + obj.street_name + "," + obj.apartment + "," + \
+                           obj.city + "," + obj.state + "," + obj.zip_code + "," + obj.occupation + "," +\
+                           str(obj.occupation_id) + "," + obj.employer + "," + str(obj.employer_id) + "," +\
+                           obj.name_code + "\n"
+                elif save_type == 'contributors':
+                    if obj.employer_id == -1:
+                        obj.employer_id = "NULL"
+                    if obj.employer is None:
+                        obj.employer = "NULL"
+                    if obj.occupation_id == -1:
+                        obj.occupation_id = "NULL"
+                    if obj.occupation is None:
+                        obj.occupation = "NULL"
+                    line = obj.name + "," + obj.c_code + "," + obj.street_no + "," + obj.street_name + "," +\
+                           obj.apartment + "," + obj.city + "," + obj.state + "," + obj.zip_code + "," +\
+                           obj.occupation + "," + str(obj.occupation_id) + "," + obj.employer + "," +\
+                           str(obj.employer_id) + "\n"
+                elif save_type == 'contributions':
+                    if obj.intermediary_id == -1 or obj.intermediary_id == 0:
+                        obj.intermediary_id = "NULL"
+
+                    if obj.candidate_id == 0 or obj.candidate_id == -1:
+                        continue
+
+                    if obj.contributor_id == 0 or obj.contributor_id == -1:
+                        continue
+
+                    line = obj.schedule + "," + obj.pageno + "," + obj.seqno + "," + obj.refno + "," + str(obj.date) +\
+                           "," + str(obj.refdate) + "," + str(obj.amount) + "," + str(obj.match_amount) + "," +\
+                           str(obj.prev_total) + "," + str(obj.payment_method_id) + "," + obj.payment_method + "," +\
+                           obj.purpose_code_id + "," + obj.purpose_code + "," + obj.exempt_code_id + "','" +\
+                           obj.adjustment_type_code_id + "," + str(obj.is_runoff) + "," + str(obj.is_segregated) +\
+                           "," + str(obj.candidate_id) + "," + str(obj.contributor_id) + "," +\
+                           str(obj.intermediary_id) + "," + obj.election_cycle + "\n"
+                print(line)
+                data.append(line)
+            f.writelines(data)
+
+    def save_candidates(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_candidates_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for candidate in self.data['candidates']:
+            data.append(candidate.office_id + "," + candidate.office + "," + candidate.cfb_id + "," + candidate.canclass + "," + candidate.committee + "," + candidate.filing + "," + candidate.name + "\n")
+        f.writelines(data)
+
+    def save_employers(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_employers_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for employer in self.data['employers']:
+            data.append(employer.name + "," + employer.street_no + "," + employer.street_name + "," + employer.city + "," + employer.state + "\n")
+        f.writelines(data)
+
+    def save_occupations(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_occupations_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for occupation in self.data['occupations']:
+            data.append(occupation.name + "," + occupation.search_name + "\n")
+        f.writelines(data)
+
+    def save_intermediaries(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_intermediaries_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for intermediary in self.data['intermediaries']:
+
+            if intermediary.name_code is None:
+                intermediary.name_code = "NULL"
+            if intermediary.employer_id is -1:
+                intermediary.employer_id = "NULL"
+            if intermediary.employer is None:
+                intermediary.employer = "NULL"
+            if intermediary.occupation_id is -1:
+                intermediary.occupation_id = "NULL"
+            if intermediary.occupation is None:
+                intermediary.occupation = "NULL"
+            data.append(intermediary.name + "," + intermediary.street_no + "," + intermediary.street_name + "," +
+                        intermediary.apartment + "," + intermediary.city + "," + intermediary.state + "," +
+                        intermediary.zip_code + "," + intermediary.occupation + "," + str(intermediary.occupation_id)
+                        + "," + intermediary.employer.strip() + "," + str(intermediary.employer_id) + "," +
+                        intermediary.name_code + "\n")
+        f.writelines(data)
+
+    def save_contributors(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_contributors_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for contributor in self.data['contributors']:
+            if contributor.employer_id is None:
+                contributor.employer_id = "NULL"
+            if contributor.employer is None:
+                contributor.employer = "NULL"
+            if contributor.occupation_id is None:
+                contributor.occupation_id = "NULL"
+            if contributor.occupation is None:
+                contributor.occupation = "NULL"
+            data.append(contributor.name + "," + contributor.c_code + "," + contributor.street_no + ","
+                        + contributor.street_name + "," + contributor.apartment + "," + contributor.city
+                        + "," + contributor.state + "," + contributor.zip_code + "," + contributor.occupation
+                        + "," + str(contributor.occupation_id) + "," + contributor.employer + "," +
+                        str(contributor.employer_id) + "\n")
+        f.writelines(data)
+
+    def save_contributions(self, file_id):
+        timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
+        f = open('data_files/' + str(file_id) + '_contributions_' + str(timestamp) + '.csv', 'w', encoding='utf-8')
+        data = []
+        for contribution in self.data['contributions']:
+            if contribution.intermediary_id == -1 or contribution.intermediary_id == 0:
+                contribution.intermediary_id = "NULL"
+
+            if contribution.candidate_id == 0 or contribution.candidate_id == -1:
+                continue
+
+            if contribution.contributor_id == 0 or contribution.contributor_id == -1:
+                continue
+
+            data.append(contribution.schedule + "," + contribution.pageno + "," + contribution.seqno + "," +
+                        contribution.refno + "," + str(contribution.date) + "," + str(contribution.refdate) + "," +
+                        str(contribution.amount) + "," + str(contribution.match_amount) + "," +
+                        str(contribution.prev_total) + "," + str(contribution.payment_method_id) + "," +
+                        contribution.payment_method + "," + contribution.purpose_code_id + "," +
+                        contribution.purpose_code + "," + contribution.exempt_code_id + "','" +
+                        contribution.adjustment_type_code_id + "," + str(contribution.is_runoff) + "," +
+                        str(contribution.is_segregated) + "," + str(contribution.candidate_id) + "," +
+                        str(contribution.contributor_id) + "," + str(contribution.intermediary_id) + "," +
+                        contribution.election_cycle + "\n")
+        f.writelines(data)
 
     def save_contribution(self, contribution, cursor):
         if contribution.intermediary_id == 0 or contribution.intermediary_id == -1:
@@ -561,24 +726,28 @@ class DataSet:
 
 def load_files(file_names):
 
+    x = 0
+
+    print(datetime.datetime.now())
+    ds2013 = DataSet()
     for file in file_names:
-        print(file)
+        print("****************************************************")
+        print("Reading File: " + file)
+        print(datetime.datetime.now())
+
         fr = FileReader(file)
         fr.read_file()
-        # x = 0
-        ds2013 = DataSet()
         for data in fr.raw_data:
             ds2013.set_all_data(data)
+            ds2013.set_distinct(('contributors',))
             ds2013.build_all()
-            # x += 1
-            # if x > 0:
-            #     break
-
-        # ds2013.print_candidates()
-        # ds2013.print_occupations()
-        # ds2013.print_intermediaries()
-        # ds2013.print_contributors()
-        # ds2013.print_contributions()
+        #     break
+        # break
+        print(datetime.datetime.now())
+        print("****************************************************")
+        print("")
+    ds2013.save(('contributors',), x)
+    print(datetime.datetime.now())
 
 parser = argparse.ArgumentParser(description='Parse NYC Campaign Finance CSVs.')
 parser.add_argument('arg_files', metavar='file_name.csv', type=str, nargs="+", help='A list of CSV files to parse.')
