@@ -1,0 +1,40 @@
+a {
+  color: #fff;
+  text-decoration: none;
+
+  &:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+}
+
+.candidate-offices li {
+  list-style-type: none;
+  font-size: 1.25em;
+  padding: 0.3125em;
+  margin: 0.125em 0;
+  border-radius: 15px 15px;
+  white-space: nowrap;
+  &:hover {
+    color: #fff;
+  }
+
+  a {
+    background-color: inherit;
+  }
+}
+
+.office-total,
+.zip-code-total {
+  display: inline-block;
+  float: right;
+  color: #fff;
+}
+
+.contribution-zip-codes li {
+  padding: 0.3125em;
+}
+
+svg {
+  border: 1px solid black;
+}

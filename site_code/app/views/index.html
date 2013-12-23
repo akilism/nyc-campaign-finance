@@ -15,6 +15,9 @@
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
+      <!-- build:css({.tmp,app}) styles/styles.css -->
+      <link rel="stylesheet" href="styles/styles.css">
+      <!-- endbuild -->
 </head>
   <body ng-app="NYCCampFi">
     <!--[if lt IE 7]>
@@ -50,6 +53,8 @@
         <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min.js"></script>
+        <script src="bower_components/d3-angular/dist/angular-d3.js"></script>
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/services/campFi.services.js"></script>

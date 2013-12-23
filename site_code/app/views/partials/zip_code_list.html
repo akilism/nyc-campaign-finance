@@ -1,0 +1,14 @@
+<div>
+    <ul d3 d3-data="zipCodes" d3-renderer="zipCodeRenderer" class="contribution-zip-codes">
+        <a ng-repeat="zipCode in zipCodes" ng-href="#/zip_code/{{zipCode.zip_code}}">
+            <li>
+                {{zipCode.zip_code}}
+                <span class="zip-code-total">{{zipCode.total | currency}}</span>
+            </li>
+        </a>
+    </ul>
+
+    <svg class="zip-code-bar-graph">
+        <g d3 d3-data="zipCodes" d3-renderer="zipCodeBarRenderer"></g>
+    </svg>
+</div>

@@ -1,5 +1,8 @@
-<ul class="candidate-offices">
-    <li ng-repeat="office in offices">
-       <a ng-href="#/office/{{office.officeId}}"><span class="office-count">{{office.count}}</span> {{office.office}} Candidates.</a>
-    </li>
+<ul d3 d3-data="offices" d3-renderer="officeRenderer" class="candidate-offices">
+    <a ng-repeat="office in offices" ng-href="#/office/{{office.officeId}}">
+        <li >
+           {{office.office}}
+               <span class="office-total">{{office.total | currency}}</span>
+        </li>
+    </a>
 </ul>

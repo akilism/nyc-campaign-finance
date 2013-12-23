@@ -5,6 +5,7 @@ var nycCampaignFinanceApp = angular.module('NYCCampFi', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
+  'd3',
   'NYCCampFi.controllers'
 ]);
 
@@ -12,19 +13,23 @@ nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'partials/office_list.html',
-        controller: 'OfficeListCtrl'
+        controller: 'OfficeListController'
       })
       .when('/office', {
         templateUrl: 'partials/office_list.html',
-        controller: 'OfficeListCtrl'
+        controller: 'OfficeListController'
+      })
+      .when('/zip_code', {
+          templateUrl: 'partials/zip_code_list.html',
+          controller: 'ZipCodeListController'
       })
       .when('/office/:officeId', {
         templateUrl: 'partials/candidate_list.html',
-        controller: 'OfficeCandidateListCtrl'
+        controller: 'OfficeCandidateListController'
       })
       .when('/candidates', {
         templateUrl: 'partials/candidate_list.html',
-        controller: 'CandidateListCtrl'
+        controller: 'CandidateListController'
       })
       .otherwise({
         redirectTo: '/'

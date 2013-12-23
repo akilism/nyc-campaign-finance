@@ -1,6 +1,6 @@
 'use strict';
 
-var data_access = require('../data_access');
+var data_access = require('../data_access_static');
 
 exports.candidates = function(req, res) {
     data_access.dataConnection.fetchAllCandidates(function(result){
@@ -18,6 +18,12 @@ exports.candidatesByOffice = function(req, res) {
     var routeParams = req.route.params;
 //    console.log(route_params);
     data_access.dataConnection.fetchCandidatesByOffice(routeParams['officeId'], function(result) {
+        res.send(result.rows);
+    });
+};
+
+exports.zipCodes = function (req, res) {
+    data_access.dataConnection.fetchAllContributionsByZipCode(function(result) {
         res.send(result.rows);
     });
 };
