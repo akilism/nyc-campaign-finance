@@ -116,9 +116,9 @@ exports.dataConnection = function() {
                     'count': 1768,
                     'total': 641975.30,
                     'party_totals': {
-                        1: 341900.00,
-                        2: 300000.00,
-                        4: 75.30
+                        1: 141900.00,
+                        2: 100000.00,
+                        4: 175.30
                     },
                     'zip_code': '10023'
                 },
@@ -126,9 +126,9 @@ exports.dataConnection = function() {
                     'count': 923,
                     'total': 640638.18,
                     'party_totals': {
-                        1: 341900.00,
-                        2: 300000.00,
-                        4: 75.30
+                        1: 241900.00,
+                        2: 200000.00,
+                        4: 275.30
                     },
                     'zip_code': '10021'
                 },
@@ -138,7 +138,7 @@ exports.dataConnection = function() {
                     'party_totals': {
                         1: 341900.00,
                         2: 300000.00,
-                        4: 75.30
+                        4: 375.30
                     },
                     'zip_code': '10024'
                 },
@@ -146,9 +146,9 @@ exports.dataConnection = function() {
                     'count': 1586,
                     'total': 527475.18,
                     'party_totals': {
-                        1: 341900.00,
-                        2: 300000.00,
-                        4: 75.30
+                        1: 441900.00,
+                        2: 400000.00,
+                        4: 475.30
                     },
                     'zip_code': '11201'
                 },
@@ -156,9 +156,9 @@ exports.dataConnection = function() {
                     'count': 890,
                     'total': 477145.18,
                     'party_totals': {
-                        1: 341900.00,
-                        2: 300000.00,
-                        4: 75.30
+                        1: 541900.00,
+                        2: 500000.00,
+                        4: 575.30
                     },
                     'zip_code': '10028'
                 },
@@ -166,9 +166,9 @@ exports.dataConnection = function() {
                     'count': 1316,
                     'total': 454358.83,
                     'party_totals': {
-                        1: 341900.00,
-                        2: 300000.00,
-                        4: 75.30
+                        1: 641900.00,
+                        2: 600000.00,
+                        4: 675.30
                     },
                     'zip_code': '10011'
                 }

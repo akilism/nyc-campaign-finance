@@ -2,12 +2,9 @@
 
 var controllers = angular.module('NYCCampFi.controllers', []);
 
-
-
 controllers.controller('CandidateListController', function ($scope, $http) {
     $http.get('/api/candidates').success(function(candidates) {
         $scope.candidates = candidates;
-        console.log('candidates     : ' + candidates);
       });
   });
 
@@ -15,7 +12,6 @@ controllers.controller('OfficeListController', function ($scope, $http) {
 
     $http.get('/api/offices').success(function(offices) {
         $scope.offices = offices;
-        console.log('offices     : ' + offices);
 
         $scope.officeRenderer = function(el, data) {
 
@@ -29,7 +25,6 @@ controllers.controller('OfficeListController', function ($scope, $http) {
 
             var off = el.selectAll('li');
             off.data(offices);
-            console.log(off);
             off.each( function(d, i) {
                 setScaleRange(150, 640);
                 var scaleValue = totalScale(d.total);
@@ -61,7 +56,6 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
 
     $http.get('/api/zip_codes').success(function(zipCodes) {
         $scope.zipCodes = zipCodes;
-        console.log('zipCodes     : ' + zipCodes);
 
         $scope.zipCodeRenderer = function(el, data) {
 
@@ -76,14 +70,12 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
             };
 
             var zips = el.selectAll('li');
-            zips.data(zipCodes);
-            console.log(zips);
+            zips.data(data);
             zips.each( function(d, i) {
                 setScaleRange(50, 800);
                 var scaleValue = totalScale(d.total);
                 d3.select(this).style({
                     'background-color': function(d) {
-                        console.log('scaleValue:   ' + scaleValue);
                         var r = Math.floor(scaleValue * 0.025);
                         var g = Math.floor(scaleValue * 0.25);
                         var b = Math.floor(scaleValue  * 0.025);
@@ -94,11 +86,33 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
             });
         };
 
+        $scope.zipCodeGradientBuilder = function(el, data) {
+            var stop = el.selectAll('linearGradient');
+            stop.data(data).
+                enter().
+                append('linearGradient').
+                attr('id', function (d) { return 'gradient_' + d.zip_code; }).
+                each(function (d){
+                    console.log(d.party_totals);
+                    console.log(this);
+                    var stop = d3.select(this).selectAll('stop');
+                    stop.data(d.party_totals).
+                        enter().
+                        append('stop').
+                        attr('offset', function(d, i) {
+                            return '5%';
+                        }).
+                        attr('stop-color', function(d, i){
+                            return '#fff';
+                        });
+                });
+        };
+
         $scope.zipCodeBarRenderer = function(el, data) {
 
-            var BAR_HEIGHT = 25;
+            var BAR_HEIGHT = 20;
             var chart = d3.select('.zip-code-bar-graph').
-                           attr('width', 640).
+                           attr('width', 600).
                            attr('height', BAR_HEIGHT * data.length);
             var domainMax = d3.max(data, function(obj)  {
                 return obj.total;
@@ -115,35 +129,11 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
                 totalScale = totalScale.rangeRound([min, max]);
             };
 
-            el.each(function() {
-                d3.select(this).append('defs');
-            });
-
-            var defs = el.selectAll('defs');
-            defs.data(zipCodes).
-                enter().
-                append('linearGradient').
-                attr('id', function (d) { return 'gradient_' + d.zip_code; }).
-                each(function(d) {
-                    d3.select(this).
-                       data(d.party_totals).
-                       enter().
-                       append('stop').
-                       attr('offset', function(d, i) {
-                            debugger;
-                            return '5%';
-                       }).
-                       attr('stop-color', function(d, i) {
-                            return '#CC0';
-                       });
-                });
-
             var zips = el.selectAll('rect');
-            console.log(zips);
             var totalX = 0;
             var prevR = 0;
-            setScaleRange(50, 640);
-            zips.data(zipCodes).
+            setScaleRange(0, 600);
+            zips.data(data).
                 sort(function(a, b) {
                     if (a.total > b.total) { return -1; }
                     if (a.total < b.total) { return  1; }
