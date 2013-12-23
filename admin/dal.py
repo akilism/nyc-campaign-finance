@@ -329,25 +329,25 @@ class DataSet:
         x = 0
         for line_data in self.all_data:
 
-            # if line_data[4] is not '':
-            #     candidate = self.build_candidates(line_data)
+            if line_data[4] is not '':
+                candidate = self.build_candidates(line_data)
 
-            if line_data[23] is not '':
+            if len(line_data) >= 27 and line_data[23] is not '':
                 employers = self.build_employers(line_data, cursor)
 
-            if line_data[22] is not '':
+            if len(line_data) >= 22 and line_data[22] is not '':
                 occupations = self.build_occupations(line_data, cursor)
 
-            # if line_data[33] is not '':
-            #     if len(employers) > 1 and employers[1] is not None:
-            #         intermediary_employer_id = employers[1].employer_id
-            #         intermediary_employer = employers[1].name
-            #     if len(occupations) > 1 and occupations[1] is not None:
-            #         intermediary_occupation_id = occupations[1].occupation_id
-            #         intermediary_occupation = occupations[1].name
-            #     intermediary = self.build_intermediaries(line_data,
-            #                                              intermediary_employer_id, intermediary_occupation_id,
-            #                                              intermediary_employer, intermediary_occupation)
+            if len(line_data) >= 33 and line_data[33] is not '':
+                if len(employers) > 1 and employers[1] is not None:
+                    intermediary_employer_id = employers[1].employer_id
+                    intermediary_employer = employers[1].name
+                if len(occupations) > 1 and occupations[1] is not None:
+                    intermediary_occupation_id = occupations[1].occupation_id
+                    intermediary_occupation = occupations[1].name
+                intermediary = self.build_intermediaries(line_data,
+                                                         intermediary_employer_id, intermediary_occupation_id,
+                                                         intermediary_employer, intermediary_occupation)
 
             if line_data[13] is not '':
                 if len(employers) > 0 and employers[0] is not None:
@@ -359,24 +359,24 @@ class DataSet:
                 contributor = self.build_contributors(line_data, contributor_employer_id, contributor_occupation_id,
                                                       contributor_employer, contributor_occupation, cursor)
 
-
             # # print("------------------------------------------------------------------------------------------")
-            # intermediary_id = 0
-            # if intermediary is not None:
-            #     intermediary_id = self.get_intermediary_id(intermediary, cursor)
-            # #     print("intermediary: " + str(intermediary) + ":   " + str(intermediary_id))
-            #
-            # candidate_id = 0
-            # if candidate is not None:
-            #     candidate_id = self.get_candidate_id(candidate, cursor)
-            # #     print("candidate: " + str(candidate) + ":   " + str(candidate_id))
-            #
-            # contributor_id = 0
-            # if contributor is not None:
-            #     contributor_id = self.get_contributor_id(contributor, cursor)
-            # #     print("contributor: " + str(contributor) + ":   " + str(contributor_id))
-            #
-            # contribution = self.build_contributions(line_data, candidate_id, contributor_id, intermediary_id)
+            intermediary_id = 0
+            if intermediary is not None:
+                intermediary_id = self.get_intermediary_id(intermediary, cursor)
+            #     print("intermediary: " + str(intermediary) + ":   " + str(intermediary_id))
+
+            candidate_id = 0
+            if candidate is not None:
+                candidate_id = self.get_candidate_id(candidate, cursor)
+            #     print("candidate: " + str(candidate) + ":   " + str(candidate_id))
+
+            contributor_id = 0
+            if contributor is not None:
+                contributor_id = self.get_contributor_id(contributor, cursor)
+            #     print("contributor: " + str(contributor) + ":   " + str(contributor_id))
+
+            if len(line_data) >= 50:
+                contribution = self.build_contributions(line_data, candidate_id, contributor_id, intermediary_id)
             # print("contribution: " + str(contribution))
             # print("------------------------------------------------------------------------------------------")
             # print("")
@@ -458,13 +458,13 @@ class DataSet:
                     line = obj.schedule + "," + obj.pageno + "," + obj.seqno + "," + obj.refno + "," + str(obj.date) +\
                            "," + str(obj.refdate) + "," + str(obj.amount) + "," + str(obj.match_amount) + "," +\
                            str(obj.prev_total) + "," + str(obj.payment_method_id) + "," + obj.payment_method + "," +\
-                           obj.purpose_code_id + "," + obj.purpose_code + "," + obj.exempt_code_id + "','" +\
+                           obj.purpose_code_id + "," + obj.purpose_code + "," + obj.exempt_code_id + "," +\
                            obj.adjustment_type_code_id + "," + str(obj.is_runoff) + "," + str(obj.is_segregated) +\
                            "," + str(obj.candidate_id) + "," + str(obj.contributor_id) + "," +\
                            str(obj.intermediary_id) + "," + obj.election_cycle + "\n"
-                print(line)
                 data.append(line)
             f.writelines(data)
+            print("Done writing file.")
 
     def save_candidates(self, file_id):
         timestamp = datetime.datetime.now().strftime("%d_%m_%Y_%H%M%S")
@@ -728,11 +728,10 @@ class DataSet:
 
 def load_files(file_names):
 
-    x = 0
-
+    x = 6
     print(datetime.datetime.now())
-    ds2013 = DataSet()
     for file in file_names:
+        ds2013 = DataSet()
         print("****************************************************")
         print("Reading File: " + file)
         print(datetime.datetime.now())
@@ -741,14 +740,16 @@ def load_files(file_names):
         fr.read_file()
         for data in fr.raw_data:
             ds2013.set_all_data(data)
-            ds2013.set_distinct(('contributors',))
+            ds2013.set_distinct(())
             ds2013.build_all()
         #     break
         # break
+        ds2013.save(('contributions',), x)
+        x += 1
         print(datetime.datetime.now())
         print("****************************************************")
         print("")
-    ds2013.save(('contributors',), x)
+
     print(datetime.datetime.now())
 
 parser = argparse.ArgumentParser(description='Parse NYC Campaign Finance CSVs.')
@@ -756,4 +757,4 @@ parser.add_argument('arg_files', metavar='file_name.csv', type=str, nargs="+", h
 args = parser.parse_args()
 load_files(args.arg_files)
 
-# data_files\1.csv data_files\2.csv data_files\3.csv data_files\4.csv data_files\5.csv data_files\6.csv data_files\7.csv data_files\8.csv data_files\9.csv data_files\10.csv data_files\11.csv data_files\12.csv data_files\13.csv data_files\14.csv
+# data_files\1.csv data_files\2.csv data_files\3.csv data_files\4.csv data_files\5.csv data_files\6.csv data_files\7_2.csv data_files\8.csv data_files\9.csv data_files\10.csv data_files\11_2.csv data_files\12.csv data_files\13.csv data_files\14.csv

@@ -81,6 +81,8 @@ class Contribution:
         self.amount = Decimal(amount)
         self.match_amount = Decimal(match_amount)
         self.prev_total = Decimal(prev_total)
+        if payment_method_id == '':
+            payment_method_id = '0'
         self.payment_method_id = int(payment_method_id)
         self.payment_method = self.get_payment_method()
         self.purpose_code_id = purpose_code_id

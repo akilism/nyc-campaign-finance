@@ -27,7 +27,7 @@ WITH (
 OIDS = FALSE
 )
 ;
-COMMENT ON TABLE public.intermediaries
+COMMENT ON TABLE public.contributions
 IS 'Contributions from contributors to candidates.';
 
 

@@ -76,47 +76,58 @@ IS 'returns the candidate in the database matching the candidate_id.';
 
 
 ---***************************************
---- select * from fetch_candidate_offices();
+--select * from fetch_candidate_offices();
+--drop function fetch_candidate_offices();
 ---***************************************
+
 CREATE OR REPLACE FUNCTION fetch_candidate_offices()
-  RETURNS TABLE(office_id int, office character(200), count bigint)
+  RETURNS TABLE(office_id int, office character(200), count bigint, total numeric)
 AS
   $$BEGIN
 	RETURN QUERY
-  SELECT
+  --Select all the office id's and names count the number of occurrences.
+SELECT
     c.office_id,
     c.office,
-    count(c.office_id) as c_count
-  from
+    count(c.office_id) as c_count,
+    cast((select sum(amount) from contributions con join candidates can on con.candidate_id = can.candidate_id where can.office_id = c.office_id and con.amount > cast(0.0 as money)) as numeric) as total
+FROM
     candidates c
-  group by
+GROUP BY
     c.office, c.office_id
-  order by
-    c.office_id DESC;
+ORDER BY
+    total desc;
+
 END;$$
 LANGUAGE plpgsql;
 COMMENT ON FUNCTION public.fetch_candidate_offices()
-IS 'returns the distinct candidate offices and office_ids and a count of number of candidates for that office.';
-
+IS 'returns the distinct candidate offices and office_ids, a count of number of candidates, and the total amount of contributions for all candidates.';
 
 ---***************************************
 --- select * from fetch_candidate_by_cfb_id('326');
 ---***************************************
 CREATE OR REPLACE FUNCTION fetch_candidate_by_cfb_id(p_cfb_id character(20))
-  RETURNS TABLE(name character(200), cfb_id character(20), candidate_id int, office_id int, office character(200))
+  RETURNS TABLE(name character(200), cfb_id character(20), candidate_id int, office_id int, office character(200), total numeric)
 AS
   $$BEGIN
 	RETURN QUERY
-		SELECT
-			c.name,
-			c.cfb_id,
-			c.candidate_id,
-			c.office_id,
-			c.office
-		FROM
-			candidates c
-		WHERE
-			c.cfb_id = p_cfb_id;
+  SELECT
+    c.name,
+    c.cfb_id,
+    c.candidate_id,
+    c.office_id,
+    c.office,
+    cast(sum(con.amount) as numeric) as total
+  FROM
+    candidates c
+    join
+    contributions con
+      on
+        con.candidate_id = c.candidate_id
+  WHERE
+    c.cfb_id = p_cfb_id
+  group by
+    c.name, c.cfb_id, c.candidate_id, c.office_id, c.office
 END;$$
 LANGUAGE plpgsql;
 COMMENT ON FUNCTION public.fetch_candidate_by_cfb_id(p_cfb_id character(20))
