@@ -93,10 +93,15 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
                 append('linearGradient').
                 attr('id', function (d) { return 'gradient_' + d.zip_code; }).
                 each(function (d){
-                    console.log(d.party_totals);
-                    console.log(this);
-                    var stop = d3.select(this).selectAll('stop');
-                    stop.data(d.party_totals).
+                    $scope.party_totals = d3.select(this).data();
+                    console.log('party_totals: ');
+                    console.log($scope.party_totals);
+                    d3.select(this).html('<stop offset="51%" stop-color="#000" />');
+                    var stop = d3.select(this).
+                        selectAll('stop').
+                        data($scope.party_totals, function (d) {
+                            console.log($scope.party_totals);
+                            return d; }).
                         enter().
                         append('stop').
                         attr('offset', function(d, i) {
