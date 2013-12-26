@@ -27,9 +27,13 @@ nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
         templateUrl: 'partials/candidate_list.html',
         controller: 'OfficeCandidateListController'
       })
-      .when('/candidates', {
+      .when('/candidate', {
         templateUrl: 'partials/candidate_list.html',
         controller: 'CandidateListController'
+      })
+      .when('/candidate/:candidateId', {
+          templateUrl: 'partials/candidate_details.html',
+          controller: 'CandidateDetailsController'
       })
       .otherwise({
         redirectTo: '/'

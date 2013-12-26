@@ -8,6 +8,12 @@ exports.candidates = function(req, res) {
     });
 };
 
+exports.candidateDetails = function(req, res) {
+    data_access.dataConnection.fetchCandidateDetails(function(result){
+        res.send(result.rows);
+    });
+};
+
 exports.offices = function (req, res) {
     data_access.dataConnection.fetchOffices(function(result) {
        res.send(result.rows);

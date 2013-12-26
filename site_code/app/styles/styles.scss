@@ -1,3 +1,12 @@
+body {
+  padding: 0 10px;
+}
+
+svg {
+  border: 1px solid black;
+  margin: 10px;
+}
+
 a {
   color: #fff;
   text-decoration: none;
@@ -8,6 +17,9 @@ a {
   }
 }
 
+h1, h2 {
+  margin: 0;
+}
 .candidate-offices li {
   list-style-type: none;
   font-size: 1.25em;
@@ -33,8 +45,4 @@ a {
 
 .contribution-zip-codes li {
   padding: 0.3125em;
-}
-
-svg {
-  border: 1px solid black;
 }

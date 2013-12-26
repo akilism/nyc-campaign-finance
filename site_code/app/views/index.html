@@ -12,12 +12,22 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-        <!-- build:css({.tmp,app}) styles/main.css -->
-        <link rel="stylesheet" href="styles/main.css">
-        <!-- endbuild -->
-      <!-- build:css({.tmp,app}) styles/styles.css -->
-      <link rel="stylesheet" href="styles/styles.css">
-      <!-- endbuild -->
+    <!-- build:css({.tmp,app}) styles/normalize.css -->
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
+    <!-- endbuild -->
+
+    <!-- build:css({.tmp,app}) styles/main.css -->
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
+    <!-- endbuild -->
+
+    <!-- build:css({.tmp,app}) styles/styles.css -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <!-- endbuild -->
+
+
+    <!-- build:js scripts/vendor/modernizr.js -->
+    <script src="bower_components/modernizr/modernizr.js"></script>
+    <!-- endbuild -->
 </head>
   <body ng-app="NYCCampFi">
     <!--[if lt IE 7]>
