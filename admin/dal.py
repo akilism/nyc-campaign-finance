@@ -728,7 +728,7 @@ class DataSet:
 
 def load_files(file_names):
 
-    x = 6
+    x = 0
     print(datetime.datetime.now())
     for file in file_names:
         ds2013 = DataSet()

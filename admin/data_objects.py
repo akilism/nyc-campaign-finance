@@ -76,10 +76,14 @@ class Contribution:
         self.refno = check_value(refno)
         self.date = get_date(date)
         self.refdate = get_date(refdate)
-        if amount is None:
-            amount = 0
+        if not is_number(amount):
+            amount = '0'
         self.amount = Decimal(amount)
+        if not is_number(match_amount):
+            match_amount = '0'
         self.match_amount = Decimal(match_amount)
+        if not is_number(prev_total):
+            prev_total = '0'
         self.prev_total = Decimal(prev_total)
         if payment_method_id == '':
             payment_method_id = '0'
@@ -379,3 +383,9 @@ def check_value(value):
         return 'NULL'
     return value
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
