@@ -67,7 +67,7 @@ controllers.controller('OfficeListController', function ($scope, $http) {
             if(data) {
                 var width = 640;
                 var height = 320;
-                var bar_height = 40;
+                var bar_height = 30;
                 var count = data.length;
                 var totalBarHeight = 0;
                 var domainMax = d3.max(data, function(obj) {
