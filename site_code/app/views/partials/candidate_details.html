@@ -1,8 +1,29 @@
-<h1>{{candidate.name}}</h1>
-<h2>{{candidate.office}}</h2>
-<h2>{{candidate.year}}</h2>
-
-
-<div class="occupation-pie" d3 d3-data="candidate.occupations" d3-renderer="occupationPieRenderer">
+<div class="candidate-details">
+    <h1>{{candidate.name}}</h1>
+    <h2>{{candidate.office}}</h2>
+    <h2>{{candidate.year}}</h2>
+</div>
+<!--<div class="occupation-pie" d3 d3-data="candidate.occupations" d3-renderer="occupationPieRenderer">-->
+    <!--<h3>Top Occupations</h3>-->
+<!--</div>-->
+<div class="employer-bar mini-graph" d3 d3-data="candidate.employers" d3-renderer="nameTotalBarGraph">
+    <h3>Top Employers</h3>
+    <hr>
+</div>
+<div class="occupation-bar mini-graph" d3 d3-data="candidate.occupations" d3-renderer="nameTotalBarGraph">
     <h3>Top Occupations</h3>
+    <hr>
+</div>
+<div class="contributor-bar mini-graph" d3 d3-data="candidate.contributors" d3-renderer="nameTotalBarGraph">
+    <h3>Top Contributors</h3>
+    <hr>
+</div>
+<div class="mini-map">
+    <h3>Top Zip Code:</h3>
+    <hr>
+    <p>
+        {{borough}} -  {{zipCode}}<br>
+        {{zipTotal | currency}}
+    </p>
+    <div id="mini_map"></div>
 </div>

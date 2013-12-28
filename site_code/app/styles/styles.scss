@@ -1,18 +1,29 @@
 body {
-  padding: 0 10px;
+  padding: 10px;
+  font-family: Helvetica Neue, Helvetica, Arial;
+  color: #18171B;
+}
+
+body > div {
+  width: 40em;
+  padding: 0.625em;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: #e4eaf0;
+  box-shadow: 10px 10px darkslategray;
 }
 
 svg {
-  border: 1px solid black;
-  margin: 10px;
+//  border: 1px solid black;
+  margin: 0;
 }
 
 a {
-  color: #fff;
+  color: #18171B;
   text-decoration: none;
 
   &:hover {
-    color: #fff;
+    color: #18171B;
     text-decoration: underline;
   }
 }
@@ -20,6 +31,26 @@ a {
 h1, h2 {
   margin: 0;
 }
+
+h3 {
+  margin: 10px 0 5px 0;
+  font-weight: 400;
+}
+
+hr {
+  border-style: solid;
+  border-width: 1px 0 0 0;
+  margin: -10px 0 5px 0;
+  border-color: #18171B;
+}
+
+.candidate-details {
+  width: 38.75rem;
+  padding: 0 .625rem;
+  background-color: #ADACC2;
+  border-radius: 5px;
+}
+
 .candidate-offices li {
   list-style-type: none;
   font-size: 1.25em;
@@ -45,4 +76,59 @@ h1, h2 {
 
 .contribution-zip-codes li {
   padding: 0.3125em;
+}
+
+.label text {
+  fill: #fff;
+  font-size: 0.875em;
+  font-weight: 100;
+  letter-spacing: 0.075em;
+}
+
+text.label-occupation-name {
+  font-weight: 700;
+}
+
+.mini-graph {
+  width: 640px;
+}
+
+.mini-map {
+
+  #mini_map {
+    height: 280px;
+  }
+
+  p {
+    margin: 0 0 0.3125em 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    padding: 0.3125em;
+    position: absolute;
+    z-index: 100;
+    display: inline-block;
+    width: 315px;
+    margin-top: 226px;
+    color: #fff;
+    font-weight: 300;
+  }
+
+}
+
+.bar rect {
+  stroke-width: 2px;
+  stroke: #e4eaf0;
+}
+
+.office-wiggle-bar g:hover {
+  cursor: pointer;
+
+  text {
+    text-decoration: underline;
+  }
+}
+
+.wiggle-label {
+  fill: #ffffff;
+  font-size: 0.875em;
+  font-weight: 300;
 }

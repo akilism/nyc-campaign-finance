@@ -1,6 +1,6 @@
 'use strict';
 
-var data_access = require('../data_access_static');
+var data_access = require('../data_access');
 
 exports.candidates = function(req, res) {
     data_access.dataConnection.fetchAllCandidates(function(result){
