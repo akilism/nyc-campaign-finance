@@ -7,10 +7,10 @@ body {
 body > div {
   width: 40em;
   padding: 0.625em;
-  border: 1px solid black;
+  /* border: 1px solid black;
   border-radius: 5px;
   background-color: #e4eaf0;
-  box-shadow: 10px 10px darkslategray;
+  box-shadow: 10px 10px darkslategray; */
 }
 
 svg {
@@ -35,12 +35,13 @@ h1, h2 {
 h3 {
   margin: 10px 0 5px 0;
   font-weight: 400;
+  font-size: 1.5em;
 }
 
 hr {
   border-style: solid;
   border-width: 1px 0 0 0;
-  margin: -10px 0 5px 0;
+  margin: -5px 0 5px 0;
   border-color: #18171B;
 }
 
@@ -116,7 +117,7 @@ text.label-occupation-name {
 
 .bar rect {
   stroke-width: 2px;
-  stroke: #e4eaf0;
+  /* stroke: #e4eaf0; */
 }
 
 .office-wiggle-bar g:hover {
@@ -131,4 +132,51 @@ text.label-occupation-name {
   fill: #ffffff;
   font-size: 0.875em;
   font-weight: 300;
+}
+
+.candidate-bar-graph
+{
+
+  .axis text {
+    font-size: 0.8em;
+  }
+  .vertical-bar {
+    fill: #48a300;
+
+    &:hover {
+      fill: #46e300;
+      cursor: pointer;
+    }
+
+    text {
+      fill: #000000;
+      font-weight: 300;
+    }
+
+    .vertical-bar-dash {
+     stroke: #000000;
+     stroke-width: 1;
+    }
+  }
+}
+.candidate-info-box {
+  height: 6.25em;
+  position: absolute;
+  margin-left: 12em;
+
+  .candidate-name {
+    font-size: 2em;
+    margin: 0;
+    font-weight: 800;
+  }
+
+  .contribution-amount {
+    font-size: 2em;
+    margin: 0;
+    font-weight: 200;
+  }
+}
+
+.graph-wrapper {
+  overflow-x: auto;
 }

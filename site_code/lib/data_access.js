@@ -65,10 +65,20 @@ exports.dataConnection = function() {
         });
     };
 
+    var fetchAllContributionsByZipCode = function (callBack) {
+
+    };
+
+    var fetchCandidateDetails = function (candidate_id, callBack) {
+
+    };
+
     return {
         fetchAllCandidates:fetchAllCandidates,
         fetchOffices:fetchOffices,
-        fetchCandidatesByOffice:fetchCandidatesByOffice
+        fetchCandidatesByOffice:fetchCandidatesByOffice,
+        fetchAllContributionsByZipCode:fetchAllContributionsByZipCode,
+        fetchCandidateDetails:fetchCandidateDetails
     }
 
 }();

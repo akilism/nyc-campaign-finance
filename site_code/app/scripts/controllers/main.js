@@ -1,6 +1,5 @@
 'use strict';
 
-
 Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep)
 {
     var n = this,
@@ -35,205 +34,310 @@ controllers.controller('OfficeListController', function ($scope, $http) {
 
     $http.get('/api/offices').success(function(offices) {
         $scope.offices = offices;
+    });
 
-        $scope.officeRenderer = function(el, data) {
+    $scope.officeRenderer = function(el, data) {
 
-            var totalScale = d3.scale.linear().domain([0, d3.max(data, function(obj)  {
-                return obj.total;
-            })]);
+        var totalScale = d3.scale.linear().domain([0, d3.max(data, function(obj)  {
+            return Math.round(obj.total_contributions);
+        })]);
 
+        var setScaleRange = function(min, max) {
+            totalScale = totalScale.rangeRound([min, max]);
+        };
+
+        var off = el.selectAll('li');
+        off.data(offices);
+        off.each( function(d, i) {
+            setScaleRange(150, 640);
+            var scaleValue = totalScale(d.total_contributions);
+            d3.select(this).style({
+                'background-color': function(d) {
+                    var r = Math.floor(scaleValue * 0.025);
+                    var g = Math.floor(scaleValue * 0.25);
+                    var b = Math.floor(scaleValue  * 0.025);
+                    return 'rgb(' + r + ', ' + g + ', ' + b +')';
+                },
+                'width': function(d) { return scaleValue + 'px'; }
+            });
+        });
+    };
+
+    $scope.wiggleBarGraph = function(el, data) {
+        if(data) {
+            var width = 640;
+            var height = 320;
+            var bar_height = 30;
+            var count = data.length;
+            var totalBarHeight = 0;
+            var domainMax = d3.max(data, function(obj) {
+                return Math.round(obj.total_contributions);
+            });
+            var domainMin = d3.min(data, function(obj) {
+                return Math.round(obj.total_contributions);
+            });
+            var totalScale = d3.scale.linear().domain([0, domainMax]);
             var setScaleRange = function(min, max) {
+                totalScale = d3.scale.linear().domain([0, domainMax]);
                 totalScale = totalScale.rangeRound([min, max]);
             };
 
-            var off = el.selectAll('li');
-            off.data(offices);
-            off.each( function(d, i) {
-                setScaleRange(150, 640);
-                var scaleValue = totalScale(d.total);
-                d3.select(this).style({
-                    'background-color': function(d) {
-                        var r = Math.floor(scaleValue * 0.025);
-                        var g = Math.floor(scaleValue * 0.25);
-                        var b = Math.floor(scaleValue  * 0.025);
-                        return 'rgb(' + r + ', ' + g + ', ' + b +')';
-                    },
-                    'width': function(d) { return scaleValue + 'px'; }
+            setScaleRange(200, width);
+
+            var svg = el.attr('width', width);
+
+            var wiggleBar = svg.selectAll('g')
+                .data(data, function(d) {
+                    return d.office_id;
                 });
-            });
-        };
 
-        $scope.wiggleBarGraph = function(el, data) {
-            if(data) {
-                var width = 640;
-                var height = 320;
-                var bar_height = 30;
-                var count = data.length;
-                var totalBarHeight = 0;
-                var domainMax = d3.max(data, function(obj) {
-                    return obj.total;
-                });
-                var domainMin = d3.min(data, function(obj) {
-                    return obj.total;
-                });
-                var totalScale = d3.scale.linear().domain([0, domainMax]);
-                var setScaleRange = function(min, max) {
-                    totalScale = d3.scale.linear().domain([0, domainMax]);
-                    totalScale = totalScale.rangeRound([min, max]);
-                };
+            var getColor = function(d, i) {
+                var scaleVal = totalScale(d.total);
+                var r = Math.floor(scaleVal * 0.025);
+                var g = Math.floor(scaleVal * 0.25);
+                var b = Math.floor(scaleVal  * 0.025);
+                //return 'rgb(' + r + ', ' + g + ', ' + b +')';
+                return 'rgb(16, 160, 16)';
+            };
 
-                setScaleRange(200, width);
-
-                var svg = el.attr('width', width);
-
-                var wiggleBar = svg.selectAll('g')
-                    .data(data, function(d) {
-                        return d.office_id;
-                    });
-
-                var getColor = function(d, i) {
-                    var scaleVal = totalScale(d.total);
-                    var r = Math.floor(scaleVal * 0.025);
-                    var g = Math.floor(scaleVal * 0.25);
-                    var b = Math.floor(scaleVal  * 0.025);
-                    //return 'rgb(' + r + ', ' + g + ', ' + b +')';
-                    return 'rgb(16, 160, 16)';
-                };
-
-                var buildWiggleBar = function(d, i) {
-
-                    if (!d.total) { return; }
-                    var scaleVal = totalScale(d.total);
-                    d.totalBars = Math.floor(scaleVal/width);
-                    d.remainderBarWidth = scaleVal % width;
-                    d.elbows = (d.remainderBarWidth > 0) ? d.totalBars : d.totalBars -1;
+            var buildWiggleBar = function(d, i) {
+                if (!d.total_contributions) { return; }
+                var scaleVal = totalScale(d.total_contributions);
+                d.totalBars = Math.floor(scaleVal/width);
+                d.remainderBarWidth = scaleVal % width;
+                d.elbows = (d.remainderBarWidth > 0) ? d.totalBars : d.totalBars -1;
 //                    console.log('totalBars             :' + d.totalBars);
 //                    console.log('remainderBarWidth     :' + d.remainderBarWidth);
 //                    console.log('elbows                :' + d.elbows);
 
-                    var getX = function(x) {
-                        return ((x % 2) == 0) ? width - bar_height - 2 : bar_height;
-                    };
-
-                    var getY = function(x) {
-                         return (x * bar_height) + totalBarHeight - (bar_height * d.totalBars);
-                    }
-
-                    for (var x = 0; x < d.totalBars; x++) {
-                        d3.select(this)
-                            .append('rect')
-                            .attr('x', function () {
-                                if (d.elbows > 0) {
-                                    if (x == 0) {
-                                        return 0;
-                                    } else if ((x > 0) && (d.remainderBarWidth > 0)) {
-                                        return bar_height - 2;
-                                    } else {
-                                        return 0;
-                                    }
-                                }//TODO Refactor this conditional.
-
-                                return 0;
-                            })
-                            .attr('y', totalBarHeight)
-                            .style('fill', getColor)
-                            .style('stroke', '#e4eaf0')
-                            .style('stroke-width', '2px')
-                            .attr('height', bar_height)
-                            .attr('width', function () {
-                                if (d.elbows > 0) {
-                                    if (x == 0) {
-                                        return width - bar_height;
-                                    } else if ((x > 0) && (d.remainderBarWidth > 0)) {
-                                        return width - (bar_height*2) + 2;
-                                    } else {
-                                        return width-bar_height;
-                                    }
-                                }
-                                return width;
-                            });
-
-                        totalBarHeight += bar_height;
-
-                    }
-
-                    if (d.remainderBarWidth > 0) {
-                        d3.select(this)
-                            .append('rect')
-                            .attr('x', function () {
-                                if(d.totalBars > 0) {
-                                    return ((d.totalBars % 2) == 0) ? bar_height - 2 : (width - d.remainderBarWidth) - bar_height;
-                                }
-
-                                return 0;
-                            })
-                            .attr('y', totalBarHeight)
-                            .style('fill', getColor)
-                            .style('stroke', '#e4eaf0')
-                            .style('stroke-width', '2px')
-                            .attr('height', bar_height)
-                            .attr('width', d.remainderBarWidth);
-                        totalBarHeight += bar_height;
-                    }
-
-                    for (var x = 0; x < d.elbows; x++) {
-                        var arc = d3.svg.arc();
-                        if((x % 2) == 0) {
-                            arc.innerRadius(2)
-                                .outerRadius(bar_height-1)
-                                .startAngle(0)
-                                .endAngle(Math.PI);
-                        } else {
-                            arc.innerRadius(2)
-                                .outerRadius(bar_height-1)
-                                .startAngle(Math.PI)
-                                .endAngle(Math.PI*2);
-                        }
-                        d3.select(this)
-                            .append('path')
-                            .attr('d', arc)
-                            .attr('transform', function(d) {
-                                return 'translate(' + getX(x) + ',' + getY(x) + ')';
-                            })
-                            .style('fill', getColor);
-                    }
-
-                    d3.select(this)
-                      .append('text')
-                      .attr('class','wiggle-label')
-                      .text(d.office + ' - ' + '$' + Number(d.total).toMoney(2))
-                      .attr('transform', function(d, i) {
-                          if (d.remainderBarWidth > 0) { d.totalBars++; }
-                          return 'translate(' + 5 + ',' + (totalBarHeight - (d.totalBars * bar_height) + (bar_height/2) + 6) + ')';
-                      });
-
+                var getX = function(x) {
+                    return ((x % 2) == 0) ? width - bar_height - 2 : bar_height;
                 };
 
-                wiggleBar.enter()
-                    .append('g')
-                    .each(buildWiggleBar)
-                    .on('click', function (d, i) {
-                        window.location.href = '/office/' + d.office_id;
-                    });
-                    //.attr('transform','rotate(180, ' + width/2 + ',' + totalBarHeight/2 + ')');
-
-                if (totalBarHeight > 0) {
-                    svg.attr('height', totalBarHeight);
+                var getY = function(x) {
+                    return (x * bar_height) + totalBarHeight - (bar_height * d.totalBars);
                 }
-            }
-        };
-    });
 
+                for (var x = 0; x < d.totalBars; x++) {
+                    d3.select(this)
+                        .append('rect')
+                        .attr('x', function () {
+                            if (d.elbows > 0) {
+                                if (x == 0) {
+                                    return 0;
+                                } else if ((x > 0) && (d.remainderBarWidth > 0)) {
+                                    return bar_height - 2;
+                                } else {
+                                    return 0;
+                                }
+                            }//TODO Refactor this conditional.
+
+                            return 0;
+                        })
+                        .attr('y', totalBarHeight)
+                        .style('fill', getColor)
+                        .style('stroke', '#ffffff')
+                        .style('stroke-width', '2px')
+                        .attr('height', bar_height)
+                        .attr('width', function () {
+                            if (d.elbows > 0) {
+                                if (x == 0) {
+                                    return width - bar_height;
+                                } else if ((x > 0) && (d.remainderBarWidth > 0)) {
+                                    return width - (bar_height*2) + 2;
+                                } else {
+                                    return width-bar_height;
+                                }
+                            }
+                            return width;
+                        });
+
+                    totalBarHeight += bar_height;
+                }
+
+                if (d.remainderBarWidth > 0) {
+                    d3.select(this)
+                        .append('rect')
+                        .attr('x', function () {
+                            if(d.totalBars > 0) {
+                                return ((d.totalBars % 2) == 0) ? bar_height - 2 : (width - d.remainderBarWidth) - bar_height;
+                            }
+
+                            return 0;
+                        })
+                        .attr('y', totalBarHeight)
+                        .style('fill', getColor)
+                        .style('stroke', '#ffffff')
+                        .style('stroke-width', '2px')
+                        .attr('height', bar_height)
+                        .attr('width', d.remainderBarWidth);
+                    totalBarHeight += bar_height;
+                }
+
+                for (var x = 0; x < d.elbows; x++) {
+                    var arc = d3.svg.arc();
+                    if((x % 2) == 0) {
+                        arc.innerRadius(2)
+                            .outerRadius(bar_height-1)
+                            .startAngle(0)
+                            .endAngle(Math.PI);
+                    } else {
+                        arc.innerRadius(2)
+                            .outerRadius(bar_height-1)
+                            .startAngle(Math.PI)
+                            .endAngle(Math.PI*2);
+                    }
+                    d3.select(this)
+                        .append('path')
+                        .attr('d', arc)
+                        .attr('transform', function(d) {
+                            return 'translate(' + getX(x) + ',' + getY(x) + ')';
+                        })
+                        .style('fill', getColor);
+                }
+
+                d3.select(this)
+                    .append('text')
+                    .attr('class','wiggle-label')
+                    .text(d.office + ' - ' + '$' + Number(d.total_contributions).toMoney(2))
+                    .attr('transform', function(d, i) {
+                        if (d.remainderBarWidth > 0) { d.totalBars++; }
+                        return 'translate(' + 5 + ',' + (totalBarHeight - (d.totalBars * bar_height) + (bar_height/2) + 6) + ')';
+                    });
+            };
+
+            wiggleBar.enter()
+                .append('g')
+                .each(buildWiggleBar)
+                .on('click', function (d, i) {
+                    window.location.href = '/office/' + d.office_id;
+                });
+            //.attr('transform','rotate(180, ' + width/2 + ',' + totalBarHeight/2 + ')');
+
+            if (totalBarHeight > 0) {
+                svg.attr('height', totalBarHeight);
+            }
+        }
+    };
 });
 
 controllers.controller('OfficeCandidateListController', function ($scope, $routeParams, $http) {
-        $scope.officeId = $routeParams.officeId;
-        $scope.url = '/api/offices/' + $scope.officeId;
-        $http.get('/api/offices/' + $routeParams.officeId).success(function(candidates) {
-            $scope.candidates = candidates;
-            console.log('office ' + $routeParams.officeId + '      : ' + candidates);
+    $scope.officeId = $routeParams.officeId;
+    $scope.url = '/api/offices/' + $scope.officeId;
+
+    $http.get('/api/offices/' + $routeParams.officeId).success(function(candidates) {
+        $scope.candidates = candidates;
+        $scope.office = candidates[0].office;
+        $scope.name = '';
+        $scope.candidate_contributions = '';
+        $scope.detail_link = '';
+
+
+//        console.log('office ' + $routeParams.officeId + '      : ' + candidates);
+    });
+
+    $scope.verticalBarGraphRenderer = function (el, data) {
+      if(data) {
+          var count_candidates = data[0].count_candidates;
+          var margin = {top: 0, right: 0, bottom: 0, left: 60}
+          var width = 640 - margin.left - margin.right;
+          var height = 800 - margin.top - margin.bottom;
+          var labelOffset = 200;
+          var bar_width = (width / count_candidates) > 20 ? width / count_candidates : 20;
+
+          if (bar_width == 20) {
+              width = (22) * count_candidates;
+          }
+
+          var domainMax = d3.max(data, function(obj) {
+             return Math.round(obj.candidate_contributions);
           });
-      });
+
+          var domainMin = d3.min(data, function(obj) {
+              return Math.round(obj.candidate_contributions);
+          });
+
+          var totalScale = null;
+
+          var setScaleRange = function(min, max) {
+              totalScale = d3.scale.linear().domain([0, domainMax]);
+              totalScale = totalScale.rangeRound([min, max]);
+          };
+
+          setScaleRange(height - labelOffset - 10, 0);
+
+          var yAxis = d3.svg.axis()
+              .scale(totalScale)
+              .orient("left")
+              .tickSize(1)
+              .tickPadding(2)
+              .ticks(10, '$');
+
+          var svg = el.attr('width', width + margin.left + margin.right)
+              .attr('height', height + margin.top + margin.bottom)
+              .append('g')
+              .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+
+          var verticalBar = svg.selectAll('g')
+              .data(data, function(d) {
+                  return d.candidate_id;
+              }).enter().append('g').attr('transform', function(d, i) {
+                  return 'translate(' + ((i * bar_width)+15) + ', 0)';
+              })
+              .attr('class', 'vertical-bar');
+
+          verticalBar.append('rect')
+              .attr('y', function(d) {
+                  return totalScale(d.candidate_contributions) - 10;
+              })
+              .attr('height', function(d) {
+                  return height - labelOffset - totalScale(d.candidate_contributions);
+              })
+              .attr('width', bar_width - 5);
+
+          verticalBar.append('line')
+              .attr('x1', (bar_width/2)-3)
+              .attr('y1', function () {
+                  return height - labelOffset - 9;
+              })
+              .attr('x2', (bar_width/2)-3)
+              .attr('y2', function() {
+                  return height - labelOffset - 2;
+              })
+              .attr('class','vertical-bar-dash');
+
+          verticalBar.append('text')
+              .attr('x', bar_width/2)
+              .attr('y', function (d) {
+                  return height - labelOffset;
+              })
+              .attr('dy', '0.6125em')
+              .text(function (d) {
+                  return d.name.trim();
+              })
+              .attr('transform', function (d, i) {
+                  return 'rotate(' + 95 + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
+              });
+
+          verticalBar.on('mouseover', function(d, i) {
+              $scope.$apply(function () {
+                  $scope.name = d.name.trim();
+                  $scope.candidate_contributions = d.candidate_contributions;
+                  $scope.detail_link = '/candidate/' + d.candidate_id;
+              });
+
+              d3.select('.candidate-info-box').style('display','block');
+
+          });
+
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis)
+              .attr('transform','translate(10, 0)');
+      }
+    };
+
+});
 
 controllers.controller('ZipCodeListController', function ($scope, $http) {
 
@@ -244,7 +348,7 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
     $scope.zipCodeRenderer = function(el, data) {
         if (data) {
             var domainMax = d3.max(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
 
             var totalScale = d3.scale.linear().domain([0, domainMax]);
@@ -278,11 +382,11 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
                 attr('width', 640).
                 attr('height', BAR_HEIGHT * data.length);
             var domainMax = d3.max(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
 
             var domainMin = d3.min(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
 
             var totalScale = d3.scale.linear().domain([0, domainMax]);
@@ -368,7 +472,6 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
     $scope.candidateId = $routeParams.candidateId;
     $scope.url = '/api/candidates/' + $scope.candidateId;
 
-
     $http.get('/api/candidates/' + $routeParams.candidateId).success(function(candidate) {
         $scope.candidate = candidate[0];
         console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate[0].name);
@@ -388,7 +491,7 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
             var radius = Math.min(width, height)/2;
             var domainMax = $scope.total;
             var domainMin = d3.min(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
             var totalScale = d3.scale.linear().domain([0, domainMax]);
             var setScaleRange = function(min, max) {
@@ -484,10 +587,10 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
             var bar_height = 40;
             var items = data.length;
             var domainMax = d3.max(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
             var domainMin = d3.min(data, function(obj)  {
-                return obj.total;
+                return Math.round(obj.total);
             });
             var totalScale = d3.scale.linear().domain([0, domainMax]);
             var setScaleRange = function(min, max) {
@@ -583,8 +686,6 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
         }
     };
 });
-
-
 
 var setupMap = function(geoData, selector) {
     var geo = L.geoJson(geoData);
