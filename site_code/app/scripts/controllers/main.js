@@ -28,7 +28,8 @@ controllers.controller('CandidateListController', function ($scope, $http) {
     $http.get('/api/candidates').success(function(candidates) {
         $scope.candidates = candidates;
       });
-  });
+});
+
 
 controllers.controller('OfficeListController', function ($scope, $http) {
 
@@ -62,7 +63,6 @@ controllers.controller('OfficeListController', function ($scope, $http) {
             });
         });
     };
-
     $scope.wiggleBarGraph = function(el, data) {
         if(data) {
             var width = 640;
@@ -231,8 +231,6 @@ controllers.controller('OfficeCandidateListController', function ($scope, $route
         $scope.name = '';
         $scope.candidate_contributions = '';
         $scope.detail_link = '';
-
-
 //        console.log('office ' + $routeParams.officeId + '      : ' + candidates);
     });
 
@@ -473,10 +471,10 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
     $scope.url = '/api/candidates/' + $scope.candidateId;
 
     $http.get('/api/candidates/' + $routeParams.candidateId).success(function(candidate) {
-        $scope.candidate = candidate[0];
-        console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate[0].name);
-        $scope.total = candidate[0].total;
-        if (candidate[0].zip_data) {
+        $scope.candidate = candidate;
+        console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate.name);
+        $scope.total = candidate.total_contributions;
+        if (candidate.zip_data) {
             setupMap(candidate[0].zip_data, 'mini_map');
             $scope.zipTotal = candidate[0].zip_data.total;
             $scope.zipCode = candidate[0].zip_data.properties.postalCode;
@@ -697,3 +695,135 @@ var setupMap = function(geoData, selector) {
         maxZoom: 18
     }).addTo(map);
 };
+
+
+controllers.controller('CandidateMonthlyController', function ($scope, $routeParams, $http) {
+
+    console.log('CandidateMonthlyController');
+    $http.get('/api/candidates/' + $routeParams.candidateId + '/months').success(function(months) {
+        console.log(months);
+        for(var month in months) {
+            months[month].contribution_date = new Date(months[month].contribution_date);
+            months[month].total = parseFloat(months[month].total);
+        }
+        $scope.months = months;
+    });
+
+    $scope.candidateMonthlyGraphRenderer = function(el, data) {
+      if(data) {
+
+          var domainMax = d3.max(data, function(obj) {
+              return Math.round(obj.total);
+          });
+
+          var margin = {top: 0, right: 0, bottom: 0, left: (domainMax > 900000) ? 70 : 60};
+          var width = 650 - margin.left - margin.right;
+          var height = 240 - margin.top - margin.bottom;
+          var count = data.length;
+
+          var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
+
+          var dateMax = data[data.length-1].contribution_date;
+          var dateMin = data[0].contribution_date;
+          var timeScale = d3.time.scale().domain([dateMin, dateMax]).range([0, width]);
+
+
+
+          var domainMin = d3.min(data, function(obj) {
+              return Math.round(obj.total);
+          });
+
+          var totalScale = null;
+
+          var setScaleRange = function(min, max) {
+              totalScale = d3.scale.linear().domain([0, domainMax]).nice();
+              totalScale = totalScale.rangeRound([min, max]);
+          };
+
+          setScaleRange(height - 50, 5);
+
+          x.domain(data.map(function(d) { return d.contribution_date; }));
+
+          var yAxis = d3.svg.axis()
+              .scale(totalScale)
+              .orient("left")
+              .tickSize(1)
+              .tickPadding(5)
+              .ticks(6, '$');
+
+          var xAxis = d3.svg.axis()
+              .scale(timeScale)
+              .tickSize(50,1)
+              .tickFormat(d3.time.format('%m, %Y'));
+
+          var svg = el.attr('width', width + margin.left + margin.right + 6)
+              .attr('height', height + margin.top + margin.bottom + 6)
+              .append('g')
+              .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+
+          var lineGraph = svg.selectAll('g')
+              .data(data, function(d) {
+                  return d.contribution_date;
+              });
+
+          var pathSegment = d3.svg.line()
+              .x(function(d) { return timeScale(d.contribution_date); })
+              .y(function(d) { return totalScale(d.total); })
+              .interpolate('linear');
+
+          svg.append('path')
+              .attr('d', pathSegment(data))
+              .attr('class', 'candidate-month-line');
+
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis)
+              .attr('transform','translate(0, 2)');
+
+          svg.append("g")
+              .attr("class", "x axis")
+              .attr('transform','translate(0, ' + (height-49) + ')')
+              .call(xAxis)
+              .selectAll('text')
+              .attr('x', 5)
+              .attr('y', 0)
+              .attr('transform', 'rotate(90)')
+              .attr('dy','.35em')
+              .style('text-anchor', 'start');
+
+          lineGraph.enter().append('svg:circle')
+              .attr('cx', function (d) { return timeScale(d.contribution_date); })
+              .attr('cy', function (d) { return totalScale(d.total); })
+              .attr('r', 4)
+              .attr('class','candidate-month-point')
+              .on('mouseover', function(d, i) {
+                  $scope.$apply(function () {
+                      $scope.month = d.contribution_date.getMonth() + 1;
+                      $scope.total = d.total;
+                      $scope.year = d.contribution_date.getFullYear();
+                  });
+                  positionToolTip('candidate_monthly_tooltip', width);
+              })
+              .on('mouseleave', function() {
+                  hideToolTip('candidate_monthly_tooltip');
+              });
+      }
+    };
+});
+
+var positionToolTip = function(id, width) {
+    var $$tooltip = $('#' + id);
+    $$tooltip.css('display','inline-block');
+    $$tooltip.css('top', event.y - ($$tooltip.height()/2) + 'px');
+
+    if((event.x + $$tooltip.width()) < width) {
+        $$tooltip.css('left', event.x + 5 + 'px');
+    } else {
+        $$tooltip.css('left', (event.x - $$tooltip.width() - 20) + 'px');
+    }
+};
+
+var hideToolTip = function(id) {
+    var $$tooltip = $('#' + id);
+    $$tooltip.css('display','none');
+}

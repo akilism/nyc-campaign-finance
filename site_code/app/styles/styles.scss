@@ -46,10 +46,24 @@ hr {
 }
 
 .candidate-details {
-  width: 38.75rem;
-  padding: 0 .625rem;
+  width: 40rem;
+  /*padding: 0 .625rem;
   background-color: #ADACC2;
-  border-radius: 5px;
+  border-radius: 5px; */
+  border-bottom: 1px solid black;
+
+  h1,h2 {
+    padding: 0;
+  }
+
+  h2 {
+    font-weight: 300;
+  }
+
+  .candidate-total {
+    font-size: 1.5em;
+    font-weight: 400;
+  }
 }
 
 .candidate-offices li {
@@ -159,6 +173,7 @@ text.label-occupation-name {
     }
   }
 }
+
 .candidate-info-box {
   height: 6.25em;
   position: absolute;
@@ -179,4 +194,46 @@ text.label-occupation-name {
 
 .graph-wrapper {
   overflow-x: auto;
+}
+
+.candidate-monthly-graph {
+  .y text {
+    font-size: 0.8em;
+  }
+
+  .candidate-month-line {
+    stroke: #ff1400;
+    stroke-width: 1.5;
+    stroke-opacity: 1;
+    fill: none;
+  }
+
+  .x text {
+    font-size: 0.65em;
+  }
+
+  .candidate-month-point {
+    stroke: #ff1400;
+    fill: #fff;
+    stroke-width: 1.5;
+    cursor: pointer;
+  }
+}
+
+.candidate-monthly-tooltip {
+  position: absolute;
+  border: 1px solid black;
+  display: none;
+  padding: 5px;
+  background: #fff;
+  box-shadow: 3px 3px 5px #636363;
+
+  p {
+    margin: 0;
+    padding: 0;
+    font-weight: 300;
+    span {
+      font-weight: 700;
+    }
+  }
 }

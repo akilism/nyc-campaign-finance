@@ -1,8 +1,9 @@
 <div class="candidate-details">
     <h1>{{candidate.name}}</h1>
-    <h2>{{candidate.office}}</h2>
-    <h2>{{candidate.year}}</h2>
+    <h2>{{candidate.office}}  {{candidate.year}}</h2>
+    <span class="candidate-total">{{candidate.total_contributions | currency}}</h2>
 </div>
+<div ng-controller="CandidateMonthlyController" ng-include="'partials/candidate_monthly.html'"></div>
 <!--<div class="occupation-pie" d3 d3-data="candidate.occupations" d3-renderer="occupationPieRenderer">-->
     <!--<h3>Top Occupations</h3>-->
 <!--</div>-->
@@ -18,6 +19,9 @@
     <h3>Top Contributors</h3>
     <hr>
 </div>
+
+
+
 <div class="mini-map">
     <h3>Top Zip Code:</h3>
     <hr>

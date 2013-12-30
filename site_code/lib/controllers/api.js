@@ -9,8 +9,11 @@ exports.candidates = function(req, res) {
 };
 
 exports.candidateDetails = function(req, res) {
-    data_access.dataConnection.fetchCandidateDetails(function(result){
-        res.send(result.rows);
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCandidateDetails(routeParams['candidateId'], function(result){
+        var candidate = result.rows[0];
+        candidate.year = 2013;
+        res.send(candidate);
     });
 };
 
@@ -30,6 +33,30 @@ exports.candidatesByOffice = function(req, res) {
 
 exports.zipCodes = function (req, res) {
     data_access.dataConnection.fetchAllContributionsByZipCode(function(result) {
+        res.send(result.rows);
+    });
+};
+
+exports.candidateMonthly = function (req, res) {
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCandidateMonthlyContributions(routeParams['candidateId'], function(result) {
+
+        res.send(result.rows);
+    });
+};
+
+exports.candidateTopOccupations = function (req, res) {
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCandidateTopNOccupations(routeParams['candidateId'], routeParams['count'], function(result) {
+
+        res.send(result.rows);
+    });
+};
+
+exports.candidateTopContributors = function (req, res) {
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCandidateTopNContributors(routeParams['candidateId'], routeParams['count'], function(result) {
+
         res.send(result.rows);
     });
 };
