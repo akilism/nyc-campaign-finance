@@ -376,7 +376,7 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
 
     $http.get('/api/candidates/' + $routeParams.candidateId).success(function(candidate) {
         $scope.candidate = candidate[0];
-        console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate[0].name);
+        //console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate[0].name);
         $scope.total = candidate[0].total;
         if (candidate[0].zip_data) {
             setupMap(candidate[0].zip_data, 'mini_map');
@@ -590,14 +590,3 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
 });
 
 
-
-var setupMap = function(geoData, selector) {
-    var geo = L.geoJson(geoData);
-    var bounds = geo.getBounds();
-    var map = L.map(selector).setView(bounds.getCenter(), 13);
-    geo.addTo(map);
-    L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-        maxZoom: 18
-    }).addTo(map);
-};
