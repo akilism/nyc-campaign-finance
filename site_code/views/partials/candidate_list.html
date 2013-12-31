@@ -1,0 +1,12 @@
+<div class="mini-graph">
+    <h3>Candidates for {{office}}</h3>
+    <hr>
+    <div class="candidate-info-box" style="display: none">
+        <p class="candidate-name">{{name}}</p>
+        <p class="contribution-amount">{{candidate_contributions | currency}}</p>
+        <a href="{{detail_link}}" title="{{name}} Details">Details</a>
+    </div>
+    <div class="graph-wrapper">
+        <svg d3="" d3-data="candidates" d3-renderer="verticalBarGraphRenderer" class="candidate-bar-graph"></svg>
+    </div>
+</div>
