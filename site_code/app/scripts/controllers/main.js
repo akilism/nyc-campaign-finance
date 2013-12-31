@@ -804,7 +804,6 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
     };
 });
 
-
 controllers.controller('CandidateMonthlyController', function ($scope, $routeParams, $http) {
 
     console.log('CandidateMonthlyController');
@@ -940,4 +939,8 @@ var hideToolTip = function(id) {
 var currencyFormat = function (d) {
     if(d === 0) { return d; }
     return "$" + d;
+};
+
+var setupMap = function(geoData, selector) {
+    //stub
 };
