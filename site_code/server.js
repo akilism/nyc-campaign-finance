@@ -6,7 +6,6 @@ var express = require('express'),
 
 var app = express();
 
-
 // Express Configuration
 app.configure('development', function(){
   app.use(require('connect-livereload')());
@@ -40,10 +39,13 @@ var api = require('./lib/controllers/api'),
 // Server Routes
 app.get('/api/candidates', api.candidates);
 app.get('/api/candidates/:candidateId?', api.candidateDetails);
+app.get('/api/candidates/:candidateId?/months', api.candidateMonthly);
+app.get('/api/candidates/:candidateId?/occupations/:count?', api.candidateTopOccupations);
+app.get('/api/candidates/:candidateId?/contributors/:count?', api.candidateTopContributors);
+app.get('/api/candidates/:candidateId?/employers/:count?', api.candidateTopEmployers);
 app.get('/api/offices', api.offices);
 app.get('/api/zip_codes', api.zipCodes);
 app.get('/api/offices/:officeId?', api.candidatesByOffice);
-
 
 // Angular Routes
 app.get('/partials/*', controllers.partials);
