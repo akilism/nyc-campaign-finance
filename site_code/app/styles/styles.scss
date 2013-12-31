@@ -93,19 +93,36 @@ hr {
   padding: 0.3125em;
 }
 
-.label text {
+.bar-label-name {
   fill: #fff;
   font-size: 0.875em;
-  font-weight: 100;
+  font-weight: 400;
   letter-spacing: 0.075em;
 }
 
+text.outside {
+  fill: #000;
+  font-weight: 500;
+}
+
 text.label-occupation-name {
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .mini-graph {
   width: 640px;
+
+  .axis {
+    stroke: rgb(210, 210, 210);
+    stroke-width: .5;
+    fill: none;
+    text {
+      fill: #000;
+      stroke: none;
+      font-size: 0.6em;
+    }
+  }
+
 }
 
 .mini-map {
@@ -130,8 +147,8 @@ text.label-occupation-name {
 }
 
 .bar rect {
-  stroke-width: 2px;
-  /* stroke: #e4eaf0; */
+//  stroke-width: 2;
+//  stroke: #fff;
 }
 
 .office-wiggle-bar g:hover {

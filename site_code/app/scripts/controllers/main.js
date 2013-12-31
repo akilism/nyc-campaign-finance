@@ -34,6 +34,11 @@ controllers.controller('CandidateListController', function ($scope, $http) {
 controllers.controller('OfficeListController', function ($scope, $http) {
 
     $http.get('/api/offices').success(function(offices) {
+        $scope.total = 0;
+        for (var x in offices) {
+            $scope.total += offices[x].total_contributions;
+        }
+
         $scope.offices = offices;
     });
 
@@ -219,9 +224,71 @@ controllers.controller('OfficeListController', function ($scope, $http) {
             }
         }
     };
+
+//    $scope.officeDonut = function(el, data) {
+//        if (data) {
+//            var width = 640;
+//            var height = 480;
+//            var domainMax = d3.max(data, function(obj)  {
+//                return Math.round(obj.total_contributions);
+//            });
+//            var domainMin = d3.min(data, function(obj)  {
+//                return Math.round(obj.total_contributions);
+//            });
+//            var totalScale = d3.scale.linear().domain([0, domainMax]);
+//            var setScaleRange = function(min, max) {
+//                totalScale = d3.scale.linear().domain([0, domainMax]);
+//                totalScale = totalScale.rangeRound([min, max]);
+//            };
+//
+//            var getColor = function(d) {
+//                setScaleRange(150, 800);
+//                var scaleValue = totalScale(d.value);
+//                var r = Math.floor(scaleValue * 0.025);
+//                var g = Math.floor(scaleValue * 0.25);
+//                var b = Math.floor(scaleValue  * 0.025);
+//                return 'rgb(' + r + ', ' + g + ', ' + b +')';
+//            };
+//
+//            var svg = el
+//                .attr('width',width)
+//                .attr('height', height);
+//
+//            var tick = function (e) {
+//                circles.selectAll('circle')
+//                    .each(cluster(10 * e.alpha * e.alpha))
+//                    .each(collide(.5))
+//                    .attr("cx", function(d) { return d.x; })
+//                    .attr("cy", function(d) { return d.y; });
+//            };
+//
+//            var force = d3.layout.force()
+//                .nodes(data)
+//                .size([width. height])
+//                .gravity(.02)
+//                .on('tick', tick)
+//                .start();
+//
+//
+//            var circles = svg.append('g')
+//                .attr('class', 'circles')
+//                .selectAll('circle').data(data).enter();
+//
+//            setScaleRange(0, height);
+//            circles.append('circle')
+//                .attr('r', function (d) {
+//                    setScaleRange(10,50);
+//                    return totalScale(d.total_contributions);
+//                })
+//                .attr('class','office-circle')
+//                .attr('fill', getColor)
+//                .call(force.drag);
+//        }
+//    };
+
 });
 
-controllers.controller('OfficeCandidateListController', function ($scope, $routeParams, $http) {
+controllers.controller('OfficeCandidateListController', function ($scope, $routeParams, $http, $window) {
     $scope.officeId = $routeParams.officeId;
     $scope.url = '/api/offices/' + $scope.officeId;
 
@@ -269,7 +336,8 @@ controllers.controller('OfficeCandidateListController', function ($scope, $route
               .orient("left")
               .tickSize(1)
               .tickPadding(2)
-              .ticks(10, '$');
+              .ticks(10)
+              .tickFormat(currencyFormat);
 
           var svg = el.attr('width', width + margin.left + margin.right)
               .attr('height', height + margin.top + margin.bottom)
@@ -323,6 +391,10 @@ controllers.controller('OfficeCandidateListController', function ($scope, $route
                   $scope.candidate_contributions = d.candidate_contributions;
                   $scope.detail_link = '/candidate/' + d.candidate_id;
               });
+
+              verticalBar.on('click', function(d, i) {
+                        $window.location.href = $scope.detail_link;
+                  });
 
               d3.select('.candidate-info-box').style('display','block');
 
@@ -472,14 +544,27 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
 
     $http.get('/api/candidates/' + $routeParams.candidateId).success(function(candidate) {
         $scope.candidate = candidate;
-        console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate.name);
+//        console.log('candidate ' + $routeParams.candidateId + '      : ' + candidate.name);
         $scope.total = candidate.total_contributions;
         if (candidate.zip_data) {
             setupMap(candidate[0].zip_data, 'mini_map');
             $scope.zipTotal = candidate[0].zip_data.total;
             $scope.zipCode = candidate[0].zip_data.properties.postalCode;
             $scope.borough = candidate[0].zip_data.properties.borough;
-        }
+        } else { $('.mini-map').css('display','none');}
+
+        $http.get('/api/candidates/' + $routeParams.candidateId + '/occupations/10').success(function(occupations) {
+            $scope.candidate.occupations = occupations;
+//            console.log('occupations : ' + occupations.length);
+        });
+        $http.get('/api/candidates/' + $routeParams.candidateId + '/contributors/10').success(function(contributors) {
+            $scope.candidate.contributors = contributors;
+//            console.log('contributors : ' + contributors.length);
+        });
+        $http.get('/api/candidates/' + $routeParams.candidateId + '/employers/10').success(function(employers) {
+            $scope.candidate.employers = employers;
+//            console.log('employers : ' + employers.length);
+        });
     });
 
     $scope.occupationPieRenderer = function(el, data) {
@@ -580,15 +665,15 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
 
     $scope.nameTotalBarGraph = function(el, data) {
         if (data) {
-            var width = 640;
-            var height = 320;
-            var bar_height = 40;
-            var items = data.length;
+            var margin = { top: 0, right: 0, bottom: 0, left: 0 };
+            var width = 640 - margin.left - margin.right;
+            var bar_height = 25;
+            var height = (bar_height * data.length) + 50;
             var domainMax = d3.max(data, function(obj)  {
-                return Math.round(obj.total);
+                return Math.round(obj.total_contributions);
             });
             var domainMin = d3.min(data, function(obj)  {
-                return Math.round(obj.total);
+                return Math.round(obj.total_contributions);
             });
             var totalScale = d3.scale.linear().domain([0, domainMax]);
             var setScaleRange = function(min, max) {
@@ -596,55 +681,72 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
                 totalScale = totalScale.rangeRound([min, max]);
             };
 
-            setScaleRange(0, width);
+            var sorter = function(a, b) {
+                if (a.total_contributions > b.total_contributions) { return -1; }
+                if (a.total_contributions < b.total_contributions) { return 1; }
+                return 0;
+            };
+
+            var getColor = function(d) {
+                setScaleRange(150, 900);
+                var scaleValue = totalScale(d.total_contributions);
+                var r = Math.floor(scaleValue * 0.025);
+                var g = Math.floor(scaleValue * 0.25);
+                var b = Math.floor(scaleValue  * 0.025);
+                return 'rgb(' + r + ', ' + g + ', ' + b +')';
+//                      return 'rgb(16, 160, 16)';
+            };
+
+
             var svg = el
-                .append('svg')
                 .attr('width',width)
-                .attr('height', function(d) {
-                    return bar_height * items;
-                });
+                .attr('height', height);
+
+            setScaleRange(0, width-20);
+
+            var axis =d3.svg.axis()
+                .scale(totalScale)
+                .orient("bottom")
+                .ticks(10)
+                .tickFormat(currencyFormat)
+                .tickSize(height)
+                .tickPadding(10);
+
+            svg.append('g').attr('class','x axis').attr('transform','translate(3, -30)').call(axis);
 
             var bar = svg.append('g')
-                .attr('class', 'bar');
+                .attr('class', 'bar')
+                .attr('transform','translate(3, 0)');
 //                .attr('transform', function(d) {
-//                    return 'translate(' + width/2 + ',' + height/2 + ')';
+//                    return 'translate(' + + ',' + + ')';
 //                });
 
             var label = svg.append('g')
-                .attr('class', 'label');
+                .attr('class', 'label')
+                .attr('transform','translate(3, 0)');
 //                .attr('transform', function(d) {
 //                    return 'translate(' + width/2 + ',' + height/2 + ')';
 //                });
+
+
 
             var rect = bar.selectAll('rect')
                 .data(data , function(d) {
                     return d.id;
                 });
 
-                rect.enter()
-                .append('rect')
-                .sort(function(a, b) {
-                    if (a.total > b.total) { return -1; }
-                    if (a.total < b.total) { return 1; }
-                    return 0;
-                })
-                .attr('height', bar_height)
-                .attr('width', function (d, i) {
-                     return totalScale(d.total);
-                })
-                .attr('y', function(d, i) {
-                    return (i * (bar_height));
-                })
-                .attr('x', 0)
-                .style('fill', function(d) {
-//                    setScaleRange(150, 800);
-//                    var scaleValue = totalScale(d.total);
-//                    var r = Math.floor(scaleValue * 0.025);
-//                    var g = Math.floor(scaleValue * 0.25);
-//                    var b = Math.floor(scaleValue  * 0.025);
-//                    return 'rgb(' + r + ', ' + g + ', ' + b +')';
-                      return 'rgb(16, 160, 16)';
-                });
+
+            rect.enter()
+            .append('rect')
+            .sort(sorter)
+            .attr('height', bar_height-5)
+            .attr('width', function (d, i) {
+                 return totalScale(d.total_contributions);
+            })
+            .attr('y', function(d, i) {
+                return (i * (bar_height));
+            })
+            .style('fill', getColor);
 
             var labels = label
                 .selectAll("text")
@@ -652,35 +754,52 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
                     return d.id;
                 });
 
+            setScaleRange(0, width);
+
+            var isInside = function (d) {
+                if(d.name.length*11 > totalScale(d.total_contributions)) {
+                    return false;
+                }
+                return true;
+            };
+
             labels.enter()
                 .append("text")
-                .sort(function(a, b) {
-                    if (a.total > b.total) { return -1; }
-                    if (a.total < b.total) { return 1; }
-                    return 0;
+                .sort(sorter)
+                .attr('class', function(d, i) {
+                    if (isInside(d)) {
+                        return 'bar-label-name';
+                    } else {
+                        return 'bar-label-name outside';
+                    }
                 })
-                .attr('class', 'label-occupation-name')
                 .text(function (d) {
                     return d.name;
                 })
                 .attr('transform', function(d, i) {
-                    return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) - 3) + ')';
+                    if (isInside(d)) {
+                        return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 2) + ')';
+                    } else {
+                        return 'translate(' + (totalScale(d.total_contributions) + 5) + ',' + ((bar_height * i) + (bar_height/2) + 2) + ')';
+                    }
                 });
 
-            labels.enter()
-                .append("text")
-                .sort(function(a, b) {
-                    if (a.total > b.total) { return -1; }
-                    if (a.total < b.total) { return 1; }
-                    return 0;
-                })
-                .attr('class', 'label-occupation-total')
-                .text(function (d) {
-                    return '$' + d.total.toMoney(2);
-                })
-                .attr('transform', function(d, i) {
-                    return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 12) + ')';
-                });
+
+
+//            labels.enter()
+//                .append("text")
+//                .sort(function(a, b) {
+//                    if (a.total_contributions > b.total_contributions) { return -1; }
+//                    if (a.total_contributions < b.total_contributions) { return 1; }
+//                    return 0;
+//                })
+//                .attr('class', 'bar-label-total')
+//                .text(function (d) {
+//                    return '$' + d.total_contributions.toMoney(2);
+//                })
+//                .attr('transform', function(d, i) {
+//                    return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 12) + ')';
+//                });
         }
     };
 });
@@ -701,7 +820,7 @@ controllers.controller('CandidateMonthlyController', function ($scope, $routePar
 
     console.log('CandidateMonthlyController');
     $http.get('/api/candidates/' + $routeParams.candidateId + '/months').success(function(months) {
-        console.log(months);
+//        console.log(months);
         for(var month in months) {
             months[month].contribution_date = new Date(months[month].contribution_date);
             months[month].total = parseFloat(months[month].total);
@@ -749,7 +868,8 @@ controllers.controller('CandidateMonthlyController', function ($scope, $routePar
               .orient("left")
               .tickSize(1)
               .tickPadding(5)
-              .ticks(6, '$');
+              .ticks(6)
+              .tickFormat(currencyFormat);
 
           var xAxis = d3.svg.axis()
               .scale(timeScale)
@@ -827,3 +947,8 @@ var hideToolTip = function(id) {
     var $$tooltip = $('#' + id);
     $$tooltip.css('display','none');
 }
+
+var currencyFormat = function (d) {
+    if(d === 0) { return d; }
+    return "$" + d;
+};

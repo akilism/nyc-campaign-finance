@@ -7,17 +7,20 @@
 <!--<div class="occupation-pie" d3 d3-data="candidate.occupations" d3-renderer="occupationPieRenderer">-->
     <!--<h3>Top Occupations</h3>-->
 <!--</div>-->
-<div class="employer-bar mini-graph" d3 d3-data="candidate.employers" d3-renderer="nameTotalBarGraph">
+<div class="mini-graph">
     <h3>Top Employers</h3>
     <hr>
+    <svg  d3 d3-data="candidate.employers" d3-renderer="nameTotalBarGraph" class="candidate-employer-graph"></svg>
 </div>
-<div class="occupation-bar mini-graph" d3 d3-data="candidate.occupations" d3-renderer="nameTotalBarGraph">
+<div class="mini-graph">
     <h3>Top Occupations</h3>
     <hr>
+    <svg  d3 d3-data="candidate.occupations" d3-renderer="nameTotalBarGraph" class="candidate-occupation-graph"></svg>
 </div>
-<div class="contributor-bar mini-graph" d3 d3-data="candidate.contributors" d3-renderer="nameTotalBarGraph">
+<div class="mini-graph">
     <h3>Top Contributors</h3>
     <hr>
+    <svg d3 d3-data="candidate.contributors" d3-renderer="nameTotalBarGraph" class="candidate-contributor-graph"></svg>
 </div>
 
 

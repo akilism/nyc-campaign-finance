@@ -6,7 +6,7 @@
 exports.dataConnection = function() {
 
     var pg = require('pg');
-    var connection_string = 'postgres://akil:12345@192.168.1.56:5432/nyc_campaign_finance';
+    var connection_string = 'postgres://akil:12345@69.118.252.78:5432/nyc_campaign_finance';
     var client = new pg.Client(connection_string);
 
     var fetchAllCandidates = function (callBack) {
@@ -206,6 +206,28 @@ exports.dataConnection = function() {
         });
     };
 
+    var fetchCandidateTopNEmployers = function (candidate_id, count, callBack) {
+        pg.connect(connection_string, function(error, client, done) {
+            if (error) { return console.error('Error fetching client from pool: ', error); }
+
+            var queryConfig = {
+                text: 'SELECT * FROM fetch_top_n_employers_by_candidate($1, $2);',
+                values: [candidate_id, count]
+            };
+
+            client.query(queryConfig, function(err, result) {
+                //call `done()` to release the client back to the pool
+                done();
+                if(err) {
+                    return console.error('error running query', err);
+                }
+
+                callBack(result);
+
+            });
+        });
+    };
+
 
     return {
         fetchAllCandidates:fetchAllCandidates,
@@ -215,6 +237,9 @@ exports.dataConnection = function() {
         fetchCandidateDetails:fetchCandidateDetails,
         fetchCandidateMonthlyContributions:fetchCandidateMonthlyContributions,
         fetchCandidateTopNContributors:fetchCandidateTopNContributors,
-        fetchCandidateTopNOccupations:fetchCandidateTopNOccupations
+        fetchCandidateTopNOccupations:fetchCandidateTopNOccupations,
+        fetchCandidateTopNEmployers:fetchCandidateTopNEmployers
     }
 }();
+
+//
