@@ -16,8 +16,8 @@ app.configure('development', function(){
 });
 
 app.configure('production', function(){
+  app.use(express.static(path.join(__dirname, '/public/')));
   app.use(express.favicon(path.join(__dirname, 'public', 'favicon.ico')));
-  app.use(express.static(path.join(__dirname, 'public')));
   app.set('views', __dirname + '/views');
 });
 

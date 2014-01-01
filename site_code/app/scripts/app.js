@@ -9,7 +9,7 @@ var nycCampaignFinanceApp = angular.module('NYCCampFi', [
   'NYCCampFi.controllers'
 ]);
 
-nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
+nycCampaignFinanceApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'partials/office_list.html',
@@ -43,4 +43,4 @@ nycCampaignFinanceApp.config(function ($routeProvider, $locationProvider) {
         redirectTo: '/'
       });
     $locationProvider.html5Mode(true);
-  });
+}]);

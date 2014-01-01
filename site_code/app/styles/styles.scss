@@ -19,12 +19,12 @@ svg {
 }
 
 a {
-  color: #18171B;
-  text-decoration: none;
+  color: #0015ec;
+  text-decoration: underline;
 
   &:hover {
     color: #18171B;
-    text-decoration: underline;
+    text-decoration: none;
   }
 }
 
@@ -95,8 +95,8 @@ hr {
 
 .bar-label-name {
   fill: #fff;
-  font-size: 0.875em;
-  font-weight: 400;
+  font-size: 1em;
+  font-weight: 200;
   letter-spacing: 0.075em;
 }
 

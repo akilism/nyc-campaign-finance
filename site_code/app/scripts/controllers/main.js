@@ -1,7 +1,6 @@
 'use strict';
 
-Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep)
-{
+Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep) {
     var n = this,
         c = isNaN(decimals) ? 2 : Math.abs(decimals), //if decimal is zero we must take it, it means user does not want to show any decimal
         d = decimal_sep || '.', //if no decimal separator is passed we use the dot as default decimal separator (we MUST use a decimal separator)
@@ -19,19 +18,18 @@ Number.prototype.toMoney = function(decimals, decimal_sep, thousands_sep)
         i = parseInt(n = Math.abs(n).toFixed(c), 10) + '',
 
         j = ((j = i.length) > 3) ? j % 3 : 0;
-    return sign + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
-}
+    return sign + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
+};
 
 var controllers = angular.module('NYCCampFi.controllers', []);
 
-controllers.controller('CandidateListController', function ($scope, $http) {
+controllers.controller('CandidateListController',['$scope', '$http', function ($scope, $http) {
     $http.get('/api/candidates').success(function(candidates) {
         $scope.candidates = candidates;
       });
-});
+}]);
 
-
-controllers.controller('OfficeListController', function ($scope, $http) {
+controllers.controller('OfficeListController',['$scope', '$http', function ($scope, $http) {
 
     $http.get('/api/offices').success(function(offices) {
         $scope.total = 0;
@@ -116,12 +114,12 @@ controllers.controller('OfficeListController', function ($scope, $http) {
 //                    console.log('elbows                :' + d.elbows);
 
                 var getX = function(x) {
-                    return ((x % 2) == 0) ? width - bar_height - 2 : bar_height;
+                    return ((x % 2) === 0) ? width - bar_height - 2 : bar_height;
                 };
 
                 var getY = function(x) {
                     return (x * bar_height) + totalBarHeight - (bar_height * d.totalBars);
-                }
+                };
 
                 for (var x = 0; x < d.totalBars; x++) {
                     d3.select(this)
@@ -286,9 +284,9 @@ controllers.controller('OfficeListController', function ($scope, $http) {
 //        }
 //    };
 
-});
+}]);
 
-controllers.controller('OfficeCandidateListController', function ($scope, $routeParams, $http, $window) {
+controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', function ($scope, $routeParams, $http, $window) {
     $scope.officeId = $routeParams.officeId;
     $scope.url = '/api/offices/' + $scope.officeId;
 
@@ -382,7 +380,7 @@ controllers.controller('OfficeCandidateListController', function ($scope, $route
                   return d.name.trim();
               })
               .attr('transform', function (d, i) {
-                  return 'rotate(' + 95 + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
+                  return 'rotate(' + 100 + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
               });
 
           verticalBar.on('mouseover', function(d, i) {
@@ -407,9 +405,9 @@ controllers.controller('OfficeCandidateListController', function ($scope, $route
       }
     };
 
-});
+}]);
 
-controllers.controller('ZipCodeListController', function ($scope, $http) {
+controllers.controller('ZipCodeListController',['$scope', '$http', function ($scope, $http) {
 
     $http.get('/api/zip_codes').success(function(zipCodes) {
         $scope.zipCodes = zipCodes;
@@ -444,7 +442,6 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
             });
         }
     };
-
     $scope.zipCodeBarRenderer = function(el, data) {
         if (data) {
             var BAR_HEIGHT = 50;
@@ -496,7 +493,6 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
                 });
         }
     };
-
     $scope.zipCodeGradientBuilder = function(el, data) {
         if (data) {
             var gradient = el.selectAll('linearGradient');
@@ -536,9 +532,9 @@ controllers.controller('ZipCodeListController', function ($scope, $http) {
         }
     };
 
-});
+}]);
 
-controllers.controller('CandidateDetailsController', function ($scope, $routeParams, $http) {
+controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '$http', function ($scope, $routeParams, $http) {
     $scope.candidateId = $routeParams.candidateId;
     $scope.url = '/api/candidates/' + $scope.candidateId;
 
@@ -662,7 +658,6 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
                 });
         }
     };
-
     $scope.nameTotalBarGraph = function(el, data) {
         if (data) {
             var margin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -778,9 +773,9 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
                 })
                 .attr('transform', function(d, i) {
                     if (isInside(d)) {
-                        return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 2) + ')';
+                        return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 3) + ')';
                     } else {
-                        return 'translate(' + (totalScale(d.total_contributions) + 5) + ',' + ((bar_height * i) + (bar_height/2) + 2) + ')';
+                        return 'translate(' + (totalScale(d.total_contributions) + 5) + ',' + ((bar_height * i) + (bar_height/2) + 3) + ')';
                     }
                 });
 
@@ -802,11 +797,10 @@ controllers.controller('CandidateDetailsController', function ($scope, $routePar
 //                });
         }
     };
-});
+}]);
 
-controllers.controller('CandidateMonthlyController', function ($scope, $routeParams, $http) {
+controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '$http', function ($scope, $routeParams, $http) {
 
-    console.log('CandidateMonthlyController');
     $http.get('/api/candidates/' + $routeParams.candidateId + '/months').success(function(months) {
 //        console.log(months);
         for(var month in months) {
@@ -917,7 +911,7 @@ controllers.controller('CandidateMonthlyController', function ($scope, $routePar
               });
       }
     };
-});
+}]);
 
 var positionToolTip = function(id, width) {
     var $$tooltip = $('#' + id);

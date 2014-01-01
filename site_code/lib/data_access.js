@@ -6,7 +6,7 @@
 exports.dataConnection = function() {
 
     var pg = require('pg');
-    var connection_string = 'postgres://akil:12345@69.118.252.78:5432/nyc_campaign_finance';
+    var connection_string = 'postgres://akil:c4mpf1y@h@69.118.252.78:5432/nyc_campaign_finance';
     var client = new pg.Client(connection_string);
 
     var fetchAllCandidates = function (callBack) {
