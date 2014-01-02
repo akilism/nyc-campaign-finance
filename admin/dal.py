@@ -7,6 +7,7 @@ import psycopg2
 
 from admin.data_objects import *
 from admin.data_structures import *
+from admin.postgres_connector import *
 
 LINES_PER_BATCH = 500
 
@@ -51,33 +52,6 @@ class FileReader:
         return self.filename
 
 
-class PostgreSQLConnector:
-
-    def __init__(self, db_name, user, passwd, host, port):
-        self.conn = psycopg2.connect("dbname=" + db_name + " user=" + user + " password=" + passwd + " host=" + host + " port=" + port)
-        self.cur = self.conn.cursor()
-
-    def get_cursor(self):
-        return self.cur
-
-    def close_cursor(self):
-        self.cur.close()
-
-    def open_cursor(self):
-        self.close_cursor()
-        self.cur = self.conn.cursor()
-
-    def close_connection(self):
-        self.close_cursor()
-        self.conn.close()
-
-    def commit_changes(self):
-        self.conn.commit()
-
-    def cursor_closed(self):
-        return self.cur.closed
-
-
 class DataSet:
 
     def __init__(self):
@@ -108,7 +82,7 @@ class DataSet:
             'occupations': False
         }
         self.quick_sort = None
-        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', '12345', 'localhost', '5432')
+        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', 'c4mpf1y@h', 'localhost', '5432')
 
     def set_all_data(self, all_data):
         self.all_data = all_data

@@ -383,6 +383,7 @@ def check_value(value):
         return 'NULL'
     return value
 
+
 def is_number(s):
     try:
         float(s)

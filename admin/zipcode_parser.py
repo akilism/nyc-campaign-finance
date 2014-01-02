@@ -1,10 +1,11 @@
 __author__ = 'akil.harris'
 
 import geojson
-import psycopg2
 import argparse
 import pprint
+import psycopg2
 
+from admin.postgres_connector import *
 data = None
 
 
@@ -17,37 +18,36 @@ def read_file(filenames):
 
     for feature in data['features']:
         properties = feature['properties']
-        geometry = feature['geometry']
-        print(properties['postalCode'])
-        print(geometry['coordinates'])
+    #     geometry = feature['geometry']
+        pprint.pprint(properties)
+    #     pprint.pprint(geometry['coordinates'])
 
 
 def save_zip_code_data():
-    # cursor.execute("INSERT INTO intermediaries (name, street_no, street_name, apartment, city, state, zip_code, "
-    #                "occupation, occupation_id, employer, employer_id, name_code) VALUES  "
-    #                "( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-    #                (intermediary.name, intermediary.street_no, intermediary.street_name, intermediary.apartment,
-    #                 intermediary.city, intermediary.state, intermediary.zip_code, intermediary.occupation,
-    #                 intermediary.occupation_id, intermediary.employer, intermediary.employer_id,
-    #                 intermediary.name_code))
+    db = PostgreSQLConnector('nyc_campaign_finance', 'akil', 'c4mpf1y@h', 'localhost', '5432')
+    cursor = db.get_cursor()
 
-var pgsql = "update"
-"zip_codes"
-"set"
-"po_name = %s"
-"state = %s"
-"borough = %s"
-"state_fips = %s"
-"city_fips = %s"
-"bldg_postal_code = ''"
-"shape_length = %s"
-"shape_area = %s"
-"api_url = %s"
-"geojson = %s"
-"where"
-"zip_code = %s"
+    for feature in data['features']:
+        properties = feature['properties']
+        geometry = feature['geometry']
+
+        try:
+            cursor.execute("UPDATE zip_codes SET po_name = %s, state = %s, borough = %s, state_fips = %s, city_fips = %s, "
+                           "bldg_postal_code = %s, shape_length = %s, shape_area = %s, api_url = %s, geojson = %s WHERE "
+                           "zip_code = %s", (properties['PO_NAME'], properties['STATE'], properties['borough'],
+                                             properties['ST_FIPS'], properties['CTY_FIPS'],
+                                             properties['BLDGpostalCode'], properties['Shape_Leng'],
+                                             properties['Shape_Area'], properties['@id'], geojson.dumps(geometry),
+                                             properties['postalCode']))
+            print("Inserted data for:")
+            pprint.pprint(properties)
+            print("++++++++++++++++++++++++++++++")
+        except psycopg2.IntegrityError:
+            print("error inserting " + properties['postalCode'])
+        db.commit_changes()
 
 parser = argparse.ArgumentParser(description='Parse geojson files.')
 parser.add_argument('arg_files', metavar='file_name.geojson', type=str, nargs="+", help='A list of geojson files to parse.')
 args = parser.parse_args()
 read_file(['C:\\users\\akil.harris\\repos\\nyc_campaign_finanace\\data_files\\nyc-zip-code-tabulation-areas-polygons-1.geojson'])
+save_zip_code_data()
