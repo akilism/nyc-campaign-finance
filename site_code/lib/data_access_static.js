@@ -176,7 +176,7 @@ exports.dataConnection = function() {
         });
     };
 
-    var fetchCandidateDetails = function(callBack) {
+    var fetchCandidateDetails = function(candidate_id, callBack) {
         callBack({'rows': [{
                 'name': 'Bill de Blasio',
                 'cfb_id': '132',

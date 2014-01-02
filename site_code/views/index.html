@@ -1,0 +1,38 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <base href="/">
+    <title>NYC Campaign Finance Explorer</title>
+    <meta name="description" content="NYC 2013 City Election Campaign Finance Explorer.">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="styles/f391268a.normalize.css"/>
+    <link rel="stylesheet" href="styles/43ec46ab.main.css"/>
+    <link rel="stylesheet" href="styles/65937ae7.leaflet.css"/>
+    <link rel="stylesheet" href="styles/393283b2.styles.css"/>
+
+    <script src="js/vendor/modernizr.js"></script>
+    </head>
+    <body ng-app="NYCCampFi">
+        <!--[if lt IE 9]>
+        <script src="bower_components/es5-shim/es5-shim.js"></script>
+        <script src="bower_components/json3/lib/json3.min.js"></script>
+        <![endif]-->
+
+        <div ng-view=""></div>
+
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min.js"></script>
+        <script src="js/vendor/leaflet.js"></script>
+
+        <script src="js/modules.js"></script>
+
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
