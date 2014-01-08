@@ -45,7 +45,8 @@ hr {
   border-color: #18171B;
 }
 
-.candidate-details {
+.candidate-details,
+.city-zip-details {
   width: 40rem;
   /*padding: 0 .625rem;
   background-color: #ADACC2;
@@ -60,9 +61,21 @@ hr {
     font-weight: 300;
   }
 
-  .candidate-total {
+  .candidate-total,
+  .zip-total {
     font-size: 1.5em;
     font-weight: 400;
+  }
+
+
+}
+
+.city-zip-details {
+//  margin-bottom: 20px;
+
+  .sub-text {
+    font-weight: 200;
+    font-size: 0.75em;
   }
 }
 
@@ -128,7 +141,7 @@ text.label-occupation-name {
 .mini-map {
 
   #mini_map {
-    height: 280px;
+    height: 320px;
   }
 
   p {
@@ -139,11 +152,17 @@ text.label-occupation-name {
     z-index: 100;
     display: inline-block;
     width: 315px;
-    margin-top: 226px;
+    margin-top: 266px;
     color: #fff;
     font-weight: 300;
   }
 
+}
+
+.city-map {
+  #city_map {
+    height: 640px;
+  }
 }
 
 .bar rect {
@@ -225,6 +244,21 @@ text.label-occupation-name {
     fill: none;
   }
 
+  .candidate-month-match-line {
+    stroke: #0d11ff;
+    stroke-width: 1;
+    stroke-opacity: 1;
+    fill: none;
+  }
+
+  .candidate-month-contribution-line {
+    stroke: #0ce02a;
+    stroke-width: 1;
+    stroke-opacity: 1;
+    fill: none;
+  }
+
+
   .x text {
     font-size: 0.65em;
   }
@@ -234,6 +268,30 @@ text.label-occupation-name {
     fill: #fff;
     stroke-width: 1.5;
     cursor: pointer;
+  }
+}
+
+.key {
+  .month-total hr,
+  .month-match hr,
+  .month-contrib hr {
+    width: 30px;
+    height: 1px;
+    border-top-width: 2px;
+    margin-right: 5px;
+    display: inline-block;
+  }
+
+  .month-total hr {
+    border-top-color: #ff1400;
+  }
+
+  .month-contrib hr {
+    border-top-color: #0ce02a;
+  }
+
+  .month-match hr {
+    border-top-color: #0d11ff;
   }
 }
 

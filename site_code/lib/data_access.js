@@ -228,6 +228,48 @@ exports.dataConnection = function() {
         });
     };
 
+    var fetchCandidateTopNZips = function (candidate_id, count, callBack) {
+        pg.connect(connection_string, function(error, client, done) {
+            if (error) { return console.error('Error fetching client from pool: ', error); }
+
+            var queryConfig = {
+                text: 'SELECT * FROM fetch_top_n_zip_codes_for_candidate($1, $2);',
+                values: [candidate_id, count]
+            };
+
+            client.query(queryConfig, function(err, result) {
+                //call `done()` to release the client back to the pool
+                done();
+                if(err) {
+                    return console.error('error running query', err);
+                }
+
+                callBack(result);
+
+            });
+        });
+    };
+
+    var fetchCityData = function (callBack) {
+        pg.connect(connection_string, function(error, client, done) {
+            if (error) { return console.error('Error fetching client from pool: ', error); }
+
+            var queryConfig = {
+                text: 'SELECT * FROM fetch_city_zip_data();'
+            };
+
+            client.query(queryConfig, function(err, result) {
+                //call `done()` to release the client back to the pool
+                done();
+                if(err) {
+                    return console.error('error running query', err);
+                }
+
+                callBack(result);
+
+            });
+        });
+    };
 
     return {
         fetchAllCandidates:fetchAllCandidates,
@@ -238,7 +280,9 @@ exports.dataConnection = function() {
         fetchCandidateMonthlyContributions:fetchCandidateMonthlyContributions,
         fetchCandidateTopNContributors:fetchCandidateTopNContributors,
         fetchCandidateTopNOccupations:fetchCandidateTopNOccupations,
-        fetchCandidateTopNEmployers:fetchCandidateTopNEmployers
+        fetchCandidateTopNEmployers:fetchCandidateTopNEmployers,
+        fetchCandidateTopNZips:fetchCandidateTopNZips,
+        fetchCityData:fetchCityData
     }
 }();
 

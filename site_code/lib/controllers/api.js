@@ -94,3 +94,23 @@ exports.candidateTopEmployers = function (req, res) {
         res.send(result.rows);
     });
 };
+
+exports.candidateTopZips = function (req, res) {
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCandidateTopNZips(routeParams['candidateId'], routeParams['count'], function(result) {
+
+//        for(var row in result.rows) {
+//            result.rows[row].zip_code = result.rows[row].zip_code.trim();
+//            result.rows[row].total_contributions = parseFloat(result.rows[row].total);
+//        }
+
+        res.send(result.rows[0].zip_json);
+    });
+};
+
+exports.city = function (req, res) {
+    var routeParams = req.route.params;
+    data_access.dataConnection.fetchCityData(function(result) {
+        res.send(result.rows[0].city_json);
+    });
+};

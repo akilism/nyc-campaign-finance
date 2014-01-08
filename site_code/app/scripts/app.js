@@ -39,7 +39,11 @@ nycCampaignFinanceApp.config(['$routeProvider', '$locationProvider', function ($
           templateUrl: 'partials/candidate_monthly.html',
           controller: 'CandidateMonthlyController'
       })
-      .otherwise({
+      .when('/city/', {
+          templateUrl: 'partials/city.html',
+          controller: 'CityController'
+      })
+        .otherwise({
         redirectTo: '/'
       });
     $locationProvider.html5Mode(true);

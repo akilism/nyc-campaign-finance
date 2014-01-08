@@ -43,7 +43,9 @@ app.get('/api/candidates/:candidateId?/months', api.candidateMonthly);
 app.get('/api/candidates/:candidateId?/occupations/:count?', api.candidateTopOccupations);
 app.get('/api/candidates/:candidateId?/contributors/:count?', api.candidateTopContributors);
 app.get('/api/candidates/:candidateId?/employers/:count?', api.candidateTopEmployers);
+app.get('/api/candidates/:candidateId?/zip_codes/:count?', api.candidateTopZips);
 app.get('/api/offices', api.offices);
+app.get('/api/city', api.city);
 app.get('/api/zip_codes', api.zipCodes);
 app.get('/api/offices/:officeId?', api.candidatesByOffice);
 
