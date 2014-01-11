@@ -4,7 +4,9 @@
 
         <h2>{{borough}}</h2>
         <h2>{{count_contributors}} Contributors</h2>
-    <span class="zip-total">{{contributions | currency}}</span>
+        <span class="zip-math">Matching Funds: {{match | currency}}</span><br>
+        <span class="zip-contributions">Contributions: {{contributions | currency}}</span><br>
+        <span class="zip-total">Total: {{total | currency}}</span>
     </div>
     <div id="map_key"></div>
     <div id="city_map"></div>

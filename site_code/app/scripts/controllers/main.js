@@ -289,7 +289,7 @@ controllers.controller('OfficeListController',['$scope', '$http', function ($sco
 controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', function ($scope, $routeParams, $http, $window) {
     $scope.officeId = $routeParams.officeId;
     $scope.url = '/api/offices/' + $scope.officeId;
-
+    $scope.option = 'candidate_total';
     $http.get('/api/offices/' + $routeParams.officeId).success(function(candidates) {
         $scope.candidates = candidates;
         $scope.office = candidates[0].office;
@@ -298,6 +298,27 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
         $scope.detail_link = '';
 //        console.log('office ' + $routeParams.officeId + '      : ' + candidates);
     });
+
+    $scope.byTotal = function byTotal() {
+        $scope.option = 'candidate_total';
+        d3.transition().duration(550).each(function() { $scope.verticalBarGraphRenderer($scope.el, $scope.candidates); });
+    };
+
+    $scope.byContributions = function byContributions() {
+        $scope.option = 'candidate_contributions';
+        d3.transition().duration(550).each(function() { $scope.verticalBarGraphRenderer($scope.el, $scope.candidates); });
+    };
+
+    $scope.byMatch = function byMatch() {
+        $scope.option = 'candidate_match';
+        d3.transition().duration(550).each(function() { $scope.verticalBarGraphRenderer($scope.el, $scope.candidates); });
+    };
+
+    $scope.byContributors = function byContributors() {
+        $scope.option = 'count_contributors';
+
+        d3.transition().duration(550).each(function() { $scope.verticalBarGraphRenderer($scope.el, $scope.candidates); });
+    };
 
     $scope.verticalBarGraphRenderer = function (el, data) {
       if(data) {
@@ -313,11 +334,11 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
           }
 
           var domainMax = d3.max(data, function(obj) {
-             return Math.round(obj.candidate_contributions);
+              return Math.round(obj[$scope.option]);
           });
 
           var domainMin = d3.min(data, function(obj) {
-              return Math.round(obj.candidate_contributions);
+              return Math.round(obj[$scope.option]);
           });
 
           var totalScale = null;
@@ -327,39 +348,56 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
               totalScale = totalScale.rangeRound([min, max]);
           };
 
-          setScaleRange(height - labelOffset - 10, 0);
+          setScaleRange(height - labelOffset - 5, 0);
+
+          if (!$scope.el) {
+              $scope.el = el;
+
+              $scope.svg = el.attr('width', width + margin.left + margin.right)
+                  .attr('height', height + margin.top + margin.bottom)
+                  .append('g')
+                  .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+
+              $scope.svg.insert("g")
+                  .attr("class", "y axis")
+                  .attr('transform','translate(10, 0)');
+          }
+
+          var svg = $scope.svg;
 
           var yAxis = d3.svg.axis()
               .scale(totalScale)
               .orient("left")
               .tickSize(1)
               .tickPadding(2)
-              .ticks(10)
-              .tickFormat(currencyFormat);
+              .ticks(10);
 
-          var svg = el.attr('width', width + margin.left + margin.right)
-              .attr('height', height + margin.top + margin.bottom)
-              .append('g')
-              .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+          if($scope.option !== 'count_contributors') {
+              yAxis.tickFormat(currencyFormat);
+          }
 
-          var verticalBar = svg.selectAll('g')
+          var verticalBar = svg.selectAll('.vertical-bar')
               .data(data, function(d) {
                   return d.candidate_id;
-              }).enter().append('g').attr('transform', function(d, i) {
+              }).sort(function (a, b) {
+                  return b[$scope.option] - a[$scope.option];
+              });
+
+          var vertEnter = verticalBar.enter().append('g').attr('transform', function(d, i) {
                   return 'translate(' + ((i * bar_width)+15) + ', 0)';
               })
               .attr('class', 'vertical-bar');
 
-          verticalBar.append('rect')
+          vertEnter.append('rect')
               .attr('y', function(d) {
-                  return totalScale(d.candidate_contributions) - 10;
+                  return totalScale(d[$scope.option]) - 10;
               })
               .attr('height', function(d) {
-                  return height - labelOffset - totalScale(d.candidate_contributions);
+                  return height - labelOffset - totalScale(d[$scope.option]);
               })
               .attr('width', bar_width - 5);
 
-          verticalBar.append('line')
+          vertEnter.append('line')
               .attr('x1', (bar_width/2)-3)
               .attr('y1', function () {
                   return height - labelOffset - 9;
@@ -370,7 +408,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
               })
               .attr('class','vertical-bar-dash');
 
-          verticalBar.append('text')
+          vertEnter.append('text')
               .attr('x', bar_width/2)
               .attr('y', function (d) {
                   return height - labelOffset;
@@ -386,7 +424,10 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
           verticalBar.on('mouseover', function(d, i) {
               $scope.$apply(function () {
                   $scope.name = d.name.trim();
+                  $scope.candidate_total = d.candidate_total;
+                  $scope.candidate_match = d.candidate_match;
                   $scope.candidate_contributions = d.candidate_contributions;
+                  $scope.count_contributors = d.count_contributors;
                   $scope.detail_link = '/candidate/' + d.candidate_id;
               });
 
@@ -398,10 +439,21 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
 
           });
 
-          svg.append("g")
-              .attr("class", "y axis")
-              .call(yAxis)
-              .attr('transform','translate(10, 0)');
+          var barUpdate = d3.transition(verticalBar)
+              .attr('transform', function(d, i) {
+                  return 'translate(' + ((i * bar_width)+15) + ', 0)';
+              });
+
+            barUpdate.select('rect')
+                .attr('height', function(d) {
+                  console.log(d.name + ' - ' + (typeof d[$scope.option]) + ' - ' + d[$scope.option]);
+                  return height - labelOffset - totalScale(d[$scope.option]);
+                })
+                .attr('y', function(d) {
+                    return totalScale(d[$scope.option]) - 10;
+                });
+
+            d3.transition(svg).select('.y.axis').call(yAxis);
       }
     };
 

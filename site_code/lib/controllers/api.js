@@ -35,6 +35,19 @@ exports.candidatesByOffice = function(req, res) {
     var routeParams = req.route.params;
 //    console.log(route_params);
     data_access.dataConnection.fetchCandidatesByOffice(routeParams['officeId'], function(result) {
+
+        for(var row in result.rows) {
+            result.rows[row].id = parseInt(result.rows[row].candidate_id, 10);
+            result.rows[row].candidate_id = parseInt(result.rows[row].candidate_id, 10);
+            result.rows[row].office_id = parseInt(result.rows[row].office_id, 10);
+            result.rows[row].count_candidates = parseInt(result.rows[row].count_candidates, 10);
+            result.rows[row].name = result.rows[row].name.trim();
+            result.rows[row].candidate_contributions = parseFloat(result.rows[row].candidate_contributions);
+            result.rows[row].candidate_match = parseFloat(result.rows[row].candidate_match) || 0.00;
+            result.rows[row].candidate_total = parseFloat(result.rows[row].candidate_total);
+            result.rows[row].count_contributors = parseInt(result.rows[row].count_contributors, 10);
+        }
+
         res.send(result.rows);
     });
 };

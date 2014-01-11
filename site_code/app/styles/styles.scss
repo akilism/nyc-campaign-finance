@@ -1,3 +1,5 @@
+$link: #0015ec;
+
 body {
   padding: 10px;
   font-family: Helvetica Neue, Helvetica, Arial;
@@ -18,8 +20,9 @@ svg {
   margin: 0;
 }
 
+
 a {
-  color: #0015ec;
+  color: $link;
   text-decoration: underline;
 
   &:hover {
@@ -67,7 +70,14 @@ hr {
     font-weight: 400;
   }
 
+}
 
+.chart-option {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  text-decoration: underline;
+  color: $link;
+  cursor: pointer;
 }
 
 .city-zip-details {
@@ -211,6 +221,7 @@ text.label-occupation-name {
 }
 
 .candidate-info-box {
+  min-width: 370px;
   height: 6.25em;
   position: absolute;
   margin-left: 12em;
@@ -222,10 +233,30 @@ text.label-occupation-name {
   }
 
   .contribution-amount {
+    font-size: 1.125em;
+    margin: 0;
+    font-weight: 200;
+  }
+
+  .match-amount {
+    font-size: 1.125em;
+    margin: 0;
+    font-weight: 200;
+  }
+
+  .total-amount {
     font-size: 2em;
     margin: 0;
     font-weight: 200;
   }
+
+  .total-contributors {
+    font-size: 1.125em;
+    margin: 0;
+    font-weight: 200;
+  }
+
+  .amount{ float: right; }
 }
 
 .graph-wrapper {

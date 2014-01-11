@@ -1,8 +1,10 @@
 <div class="candidate-details">
     <h1>{{candidate.name}}</h1>
     <h2>{{candidate.office}}  {{candidate.year}}</h2>
-    <span class="candidate-total">{{candidate.total_contributions | currency}}
-</span></div>
+    <span class="candidate-contributions">Contributions: {{candidate.total_contributions | currency}}<br>
+    <span class="candidate-match">Matching Funds: {{candidate.total_match | currency}}<br>
+    <span class="candidate-total">Total: {{candidate.total | currency}}
+</span></span></span></div>
 <div ng-controller="CandidateMonthlyController" ng-include="'partials/candidate_monthly.html'"></div>
 <!--<div class="occupation-pie" d3 d3-data="candidate.occupations" d3-renderer="occupationPieRenderer">-->
     <!--<h3>Top Occupations</h3>-->
