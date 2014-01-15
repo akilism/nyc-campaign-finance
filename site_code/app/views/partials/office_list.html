@@ -9,5 +9,21 @@
 <div class="mini-graph">
     <h3>Offices</h3>
     <hr>
-    <svg d3 d3-data="offices" d3-renderer="wiggleBarGraph" class="office-wiggle-bar"></svg>
+    <ul>
+        <li ng-click="byTotal()" class="chart-option">By Total</li>
+        <li ng-click="byContributions()" class="chart-option">By Contributions</li>
+        <li ng-click="byMatch()" class="chart-option">By Matching Funds</li>
+        <li ng-click="byContributors()" class="chart-option">By Number of Contributors</li>
+    </ul>
+    <svg d3 d3-data="offices" d3-renderer="officeBubble" class="office-bubble"></svg>
 </div>
+<div class="office-details" ng-class="displayClass" ng-click="displayClass=''">
+    <ul>
+        <li>{{name}}</li>
+        <li>{{value}}</li>
+    </ul>
+</div>
+
+        <script>
+
+        </script>

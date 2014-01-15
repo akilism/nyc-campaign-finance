@@ -25,6 +25,9 @@ exports.offices = function (req, res) {
             result.rows[row].office = result.rows[row].office.trim();
             result.rows[row].total_contributions = parseFloat(result.rows[row].total_contributions);
             result.rows[row].total_debits = parseFloat(result.rows[row].total_debits);
+            result.rows[row].total = parseFloat(result.rows[row].total_total);
+            result.rows[row].total_match = parseFloat(result.rows[row].total_match);
+            result.rows[row].count_contributors = parseInt(result.rows[row].count_contributors, 10);
         }
 
         res.send(result.rows);

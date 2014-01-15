@@ -1,5 +1,22 @@
 $link: #0015ec;
 
+$scale0: #034e7b;
+$scale1: #0c2c84;
+$scale2: #225ea8;
+$scale3: #1d91c0;
+$scale4: #41b6c4;
+$scale5: #7fcdbb;
+$scale6: #c7e9b4;
+$scale7: #ffffcc;
+$scale8: #f7fcb9;
+$scale9: #d9f0a3;
+$scale10: #addd8e;
+$scale11: #78c679;
+$scale12: #41ab5d;
+$scale13: #238443;
+$scale14: #006837;
+$scale15: #004529;
+
 body {
   padding: 10px;
   font-family: Helvetica Neue, Helvetica, Arial;
@@ -180,6 +197,11 @@ text.label-occupation-name {
 //  stroke: #fff;
 }
 
+
+.office-bubble {
+  width: 100%;
+}
+
 .office-wiggle-bar g:hover {
   cursor: pointer;
 
@@ -254,6 +276,8 @@ text.label-occupation-name {
     font-size: 1.125em;
     margin: 0;
     font-weight: 200;
+    width: 200px;
+    display: inline-block;
   }
 
   .amount{ float: right; }
@@ -340,6 +364,48 @@ text.label-occupation-name {
     font-weight: 300;
     span {
       font-weight: 700;
+    }
+  }
+}
+
+
+.office-bubble g.bubble {
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.office-details {
+  position: fixed;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.73);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity .15s;
+
+  &.shown {
+    opacity: 1;
+    transition: opacity .3s;
+  }
+
+  ul {
+    margin: 0;
+    padding: .5em;
+    list-style-type: none;
+  }
+}
+
+table.funds {
+
+  border: 1px solid black;
+  border-width: 1px 0;
+
+  tr {
+    td {
+      text-align: right;
+      padding: 5px 5px 0 0;
     }
   }
 }
