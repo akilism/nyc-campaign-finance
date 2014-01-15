@@ -674,7 +674,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
                   $scope.candidate_total = d.candidate_total;
                   $scope.candidate_match = d.candidate_match;
                   $scope.candidate_contributions = d.candidate_contributions;
-                  $scope.count_contributors = d.count_contributors;
+                  $scope.count_contributors = d.count_contributors.toLocaleString();
                   $scope.detail_link = '/candidate/' + d.candidate_id;
               });
 
@@ -1180,27 +1180,27 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
               .y(function(d) { return totalScale(d.total); })
               .interpolate('linear');
 
-          var pathSegmentContributions = d3.svg.line()
-              .x(function(d) { return timeScale(d.contribution_date); })
-              .y(function(d) { return totalScale(d.total_contributions); })
-              .interpolate('linear');
-
-          var pathSegmentMatch = d3.svg.line()
-              .x(function(d) { return timeScale(d.contribution_date); })
-              .y(function(d) { return totalScale(d.total_match); })
-              .interpolate('linear');
+//          var pathSegmentContributions = d3.svg.line()
+//              .x(function(d) { return timeScale(d.contribution_date); })
+//              .y(function(d) { return totalScale(d.total_contributions); })
+//              .interpolate('linear');
+//
+//          var pathSegmentMatch = d3.svg.line()
+//              .x(function(d) { return timeScale(d.contribution_date); })
+//              .y(function(d) { return totalScale(d.total_match); })
+//              .interpolate('linear');
 
           svg.append('path')
               .attr('d', pathSegment(data))
               .attr('class', 'candidate-month-line');
 
-          svg.append('path')
-              .attr('d', pathSegmentContributions(data))
-              .attr('class', 'candidate-month-contribution-line');
-
-          svg.append('path')
-              .attr('d', pathSegmentMatch(data))
-              .attr('class', 'candidate-month-match-line');
+//          svg.append('path')
+//              .attr('d', pathSegmentContributions(data))
+//              .attr('class', 'candidate-month-contribution-line');
+//
+//          svg.append('path')
+//              .attr('d', pathSegmentMatch(data))
+//              .attr('class', 'candidate-month-match-line');
 
           svg.append("g")
               .attr("class", "y axis")
@@ -1223,7 +1223,7 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
               .attr('cy', function (d) { return totalScale(d.total); })
               .attr('r', 4)
               .attr('class','candidate-month-point')
-              .on('mouseover', function(d, i) {
+              .on('mousemove', function(d, i) {
                   $scope.$apply(function () {
                       $scope.month = d.contribution_date.getMonth() + 1;
                       $scope.total = d.total;
@@ -1387,7 +1387,7 @@ controllers.controller('CityController',['$scope', '$http', function ($scope, $h
 var positionToolTip = function(id, width) {
     var $$tooltip = $('#' + id);
     $$tooltip.css('display','inline-block');
-    $$tooltip.css('top', event.y - ($$tooltip.height()/2) + 'px');
+    $$tooltip.css('top', (event.pageY - ($$tooltip.height()/2)) + 'px');
 
     if((event.x + $$tooltip.width()) < width) {
         $$tooltip.css('left', event.x + 5 + 'px');
