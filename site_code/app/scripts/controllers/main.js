@@ -337,7 +337,7 @@ controllers.controller('OfficeListController',['$scope', '$http', function ($sco
                     return d.name + ' - $' + d.value.toMoney();
                 });
 
-            officeEnter.append('circle')
+            officeEnter.append('circle').transition()
                 .attr('r', function(d) {
                     return d.r + 5;
                 })
@@ -1110,11 +1110,12 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
 
     $http.get('/api/candidates/' + $routeParams.candidateId + '/months').success(function(months) {
 //        console.log(months);
-        for(var i = 0; i < months.length; i++) {
+        for(var i = 0, len = months.length; i < len; i++) {
             months[i].contribution_date = new Date(months[i].contribution_date);
             months[i].total = parseFloat(months[i].total);
         }
         $scope.months = months;
+        $scope.total_month = 0.0;
     });
 
     $scope.candidateMonthlyGraphRenderer = function(el, data) {
@@ -1134,7 +1135,6 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
           var dateMax = data[data.length-1].contribution_date;
           var dateMin = data[0].contribution_date;
           var timeScale = d3.time.scale().domain([dateMin, dateMax]).range([0, width]);
-
 
 
           var domainMin = d3.min(data, function(obj) {
@@ -1226,7 +1226,7 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
               .on('mousemove', function(d, i) {
                   $scope.$apply(function () {
                       $scope.month = d.contribution_date.getMonth() + 1;
-                      $scope.total = d.total;
+                      $scope.month_total = d.total;
                       $scope.year = d.contribution_date.getFullYear();
                   });
                   positionToolTip('candidate_monthly_tooltip', width);
@@ -1260,7 +1260,7 @@ controllers.controller('CityController',['$scope', '$http', function ($scope, $h
 
                         layer.on('mouseover', function (e) {
                             layer.setStyle( {
-                                fillColor: 'rgb(255,0,0)',
+                                fillColor: 'rgb(241, 169, 15)',
                                 fillOpacity: '0.9'
                             });
 
@@ -1283,7 +1283,7 @@ controllers.controller('CityController',['$scope', '$http', function ($scope, $h
                         });
 
                         layer.setStyle({
-                            color: 'rgb(0,0,0)',
+                            color: 'rgb(0, 0, 0)',
                             weight: '1',
                             fillColor: feature.color,
                             fillOpacity: '0.9'

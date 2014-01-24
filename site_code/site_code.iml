@@ -12,6 +12,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Node.js Dependencies for site_code" level="project" />
     <orderEntry type="library" name="sass-stdlib" level="application" />
+    <orderEntry type="library" name="Python 2.7.5 (/System/Library/Frameworks/Python.framework/Versions/2.7/bin/python) interpreter library" level="application" />
   </component>
 </module>
 

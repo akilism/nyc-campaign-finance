@@ -10,11 +10,22 @@
     <hr>
     <div class="candidate-info-box" style="display: none">
         <p class="candidate-name">{{name}}</p>
-        <p class="total-contributors">{{count_contributors}} Contributors</p>
-        <p class="match-amount">Matching Funds: <span class="amount">{{candidate_match | currency}}</span></p>
-        <p class="contribution-amount">Contributions: <span class="amount">{{candidate_contributions | currency}}</span></p>
-        <p class="total-amount">Total: <span class="amount">{{candidate_total | currency}}</span></p>
-        <a href="{{detail_link}}" title="{{name}} Details">Details</a>
+        <p class="total-contributors">{{count_contributors}} Contributors</p><a href="{{detail_link}}" title="{{name}} Details">Details</a>
+        <table class="funds">
+            <tr class="match-amount">
+                <td>Matching Funds:</td>
+                <td>{{candidate_match | currency}}</td>
+            </tr>
+            <tr class="contribution-amount">
+                <td>Contributions Funds:</td>
+                <td>{{candidate_contributions | currency}}</td>
+            </tr>
+            <tr class="total-amount">
+                <td>Total Funds:</td>
+                <td>{{candidate_total | currency}}</td>
+            </tr>
+        </table>
+
     </div>
     <div class="graph-wrapper">
         <svg d3="" d3-data="candidates" d3-renderer="verticalBarGraphRenderer" class="candidate-bar-graph"></svg>
