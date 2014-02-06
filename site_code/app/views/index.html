@@ -11,6 +11,7 @@
     <meta name="description" content="NYC 2013 City Election Campaign Finance Explorer.">
     <meta name="viewport" content="width=device-width">
 
+    <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700' rel='stylesheet' type='text/css'>
     <!-- build:css({.tmp,app}) styles/normalize.css -->
     <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
     <!-- endbuild -->
@@ -34,7 +35,9 @@
         <script src="bower_components/json3/lib/json3.min.js"></script>
         <![endif]-->
 
+
         <div ng-view></div>
+
 
         <script src="bower_components/angular/angular.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
@@ -52,8 +55,14 @@
         <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) js/scripts.js -->
-        <script src="scripts/controllers/main.js"></script>
         <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/main.js"></script>
+        <script src="scripts/controllers/candidates.js"></script>
+        <script src="scripts/controllers/offices.js"></script>
+        <script src="scripts/controllers/candidate.js"></script>
+        <script src="scripts/controllers/candidatemonthly.js"></script>
+        <script src="scripts/controllers/city.js"></script>
+        <script src="scripts/directives/loader.js"></script>
         <!-- endbuild -->
     </body>
 </html>

@@ -1,6 +1,7 @@
 <div class="mini-graph">
     <h3>Candidates for {{office}}</h3>
     <hr>
+    <loader></loader>
     <ul>
         <li ng-click="byTotal()" class="chart-option">By Total</li>
         <li ng-click="byContributions()" class="chart-option">By Contributions</li>
@@ -8,26 +9,44 @@
         <li ng-click="byContributors()" class="chart-option">By Number of Contributors</li>
     </ul>
     <hr>
-    <div class="candidate-info-box" style="display: none;">
-        <p class="candidate-name">{{name}}</p>
-        <p class="total-contributors">{{count_contributors}} Contributors</p><a href="{{detail_link}}" title="{{name}} Details">Details</a>
-        <table class="funds">
-            <tr class="match-amount">
-                <td>Matching Funds:</td>
-                <td>{{candidate_match | currency}}</td>
-            </tr>
-            <tr class="contribution-amount">
-                <td>Contributions Funds:</td>
-                <td>{{candidate_contributions | currency}}</td>
-            </tr>
-            <tr class="total-amount">
-                <td>Total Funds:</td>
-                <td>{{candidate_total | currency}}</td>
-            </tr>
-        </table>
+    <ul class="selected-candidates">
+        <li ng-repeat="candidate in selectedCandidates" id="{{candidate.id}}" class="candidate-button-selected">
+            {{candidate.name}}
+        </li>
+    </ul>
+    <hr>
+    <ul class="candidate-list">
+        <li ng-repeat="candidate in candidates" id="can_{{$index}}" class="candidate-button" ng-click="toggleSelected($event)">
+            {{candidate.name}}
+        </li>
+    </ul>
+    <div class="candidates graph-wrapper">
+        <svg d3 d3-data="selectedCandidates" d3-renderer="verticalBarGraphRenderer" class="candidate-bar-graph"></svg>
+    </div>
+    <!--<hr>-->
+    <!--<div class="candidate-info-box" style="display: none;">-->
+        <!--<p class="candidate-name">{{name}}</p>-->
+        <!--<p class="total-contributors">{{count_contributors}} Contributors</p><a href="{{detail_link}}" title="{{name}} Details">Details</a>-->
+        <!--<table class="funds">-->
+            <!--<tr class="match-amount">-->
+                <!--<td>Matching Funds:</td>-->
+                <!--<td>{{candidate_match | currency}}</td>-->
+            <!--</tr>-->
+            <!--<tr class="contribution-amount">-->
+                <!--<td>Contributions Funds:</td>-->
+                <!--<td>{{candidate_contributions | currency}}</td>-->
+            <!--</tr>-->
+            <!--<tr class="total-amount">-->
+                <!--<td>Total Funds:</td>-->
+                <!--<td>{{candidate_total | currency}}</td>-->
+            <!--</tr>-->
+        <!--</table>-->
 
+    <!--</div>-->
+
+    <div id="candidate_info" class="candidate-info tooltip">
+        {{candidate_name}}<br />
+        {{candidate_value}}
     </div>
-    <div class="graph-wrapper">
-        <svg d3 d3-data="candidates" d3-renderer="verticalBarGraphRenderer" class="candidate-bar-graph"></svg>
-    </div>
+
 </div>
