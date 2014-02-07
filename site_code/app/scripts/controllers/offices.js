@@ -129,7 +129,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
       var bubbles = d3.layout.pack()
           .sort(null)
           .size([diameter, diameter])
-          .padding(11.5)
+          .padding(12)
           .nodes(root)
           .filter(function (d) {
             return !d.children;
@@ -144,7 +144,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
       var officeEnter = office.enter()
           .append('g')
           .attr('class','bubble')
-          .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-80) + ')' });
+          .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-120) + ')' });
 
       officeEnter.append('title')
           .text(function (d) {
@@ -222,7 +222,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
 
 
       var officeUpdate = d3.transition(office)
-          .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-80) + ')' });
+          .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-120) + ')' });
 
       officeUpdate.select('circle')
           .attr('r', function(d) {
