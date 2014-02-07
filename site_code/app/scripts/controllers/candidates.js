@@ -6,6 +6,14 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
     $scope.url = '/api/offices/' + $scope.officeId;
     $scope.option = 'candidate_total';
     $http.get('/api/offices/' + $routeParams.officeId).success(function(candidates) {
+
+      $scope.office = candidates[0].office;
+      $scope.candidate_name = '';
+      $scope.candidate_value = '';
+      $scope.candidate_contributions = '';
+      $scope.candidate_match = '';
+      $scope.detail_link = '';
+      $scope.selectedCandidates = candidates.slice(0, 5);
       $scope.candidates = candidates.sort(function (a, b) {
         if(a.name < b.name) { return -1; }
 
@@ -13,13 +21,6 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
 
         return 0;
       });
-      $scope.office = candidates[0].office;
-      $scope.candidate_name = '';
-      $scope.candidate_value = '';
-      $scope.candidate_contributions = '';
-      $scope.candidate_match = '';
-      $scope.detail_link = '';
-      $scope.selectedCandidates = [];
       nycCampaignFinanceApp.emitLoaded($rootScope);
   //        console.log('office ' + $routeParams.officeId + '      : ' + candidates);
   });
@@ -48,16 +49,16 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
     }
 
     if(data && data.length > 0) {
-      var count_candidates = data[0].count_candidates;
-      var margin = {top: 25, right: 0, bottom: 0, left: 65}
-      var width = 640 - margin.left - margin.right;
+      var count_candidates = data.length;
+      var margin = {top: 20, right: 0, bottom: 0, left: 5}
+      var width = 795 - margin.left - margin.right;
       var height = 640 - margin.top - margin.bottom;
-      var labelOffset = 200;
-      var bar_width = (width / count_candidates) > 20 ? width / count_candidates : 20;
+      var labelOffset = 225;
+      var bar_width = 35; //(width / count_candidates) > 20 ? width / count_candidates : 20;
 
-      if (bar_width == 20) {
-        width = (22) * count_candidates;
-      }
+//      if (bar_width == 20) {
+//        width = (22) * count_candidates;
+//      }
 
       var domainMax = d3.max(data, function(obj) {
         return Math.round(obj[$scope.option]);
@@ -74,7 +75,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
         totalScale = totalScale.rangeRound([min, max]);
       };
 
-      setScaleRange(height - labelOffset - 5, 0);
+      setScaleRange(0, width - 30 - labelOffset);
 
       if (!$scope.svg) {
 
@@ -84,21 +85,21 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
             .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
 
         $scope.svg.insert("g")
-            .attr("class", "y axis")
-            .attr('transform','translate(10, 0)');
+            .attr("class", "x axis")
+            .attr('transform','translate(' + labelOffset + ', ' + (height - 30) + ')');;
       }
 
       var svg = $scope.svg;
 
-      var yAxis = d3.svg.axis()
+      var xAxis =d3.svg.axis()
           .scale(totalScale)
-          .orient("left")
-          .tickSize(1)
-          .tickPadding(2)
-          .ticks(10);
+          .orient("top")
+          .ticks(5)
+          .tickSize(height - 30)
+          .tickPadding(10);
 
       if($scope.option !== 'count_contributors') {
-        yAxis.tickFormat(nycCampaignFinanceApp.currencyFormat);
+       xAxis.tickFormat(nycCampaignFinanceApp.currencyFormat);
       }
 
       var verticalBar = svg.selectAll('.vertical-bar')
@@ -109,47 +110,51 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
           });
 
       var vertEnter = verticalBar.enter().append('g').attr('transform', function(d, i) {
-        return 'translate(' + ((i * bar_width)+15) + ', 0)';
+        return 'translate(' + labelOffset + ',' + ((i * bar_width)+15) + ')';
       })
           .attr('class', 'vertical-bar');
 
       vertEnter.append('rect')
-          .attr('y', function(d) {
-            return totalScale(d[$scope.option]) - 10;
+//          .attr('x', function(d) {
+//            return totalScale(d[$scope.option]) - 10;
+//          })
+          .attr('width', function(d) {
+            return totalScale(d[$scope.option]);
           })
-          .attr('height', function(d) {
-            return height - labelOffset - totalScale(d[$scope.option]);
-          })
-          .attr('width', bar_width - 5);
+          .attr('height', bar_width - 5);
 
-      vertEnter.append('line')
-          .attr('x1', (bar_width/2)-3)
-          .attr('y1', function () {
-            return height - labelOffset - 9;
-          })
-          .attr('x2', (bar_width/2)-3)
-          .attr('y2', function() {
-            return height - labelOffset - 2;
-          })
-          .attr('class','vertical-bar-dash');
-
+//      vertEnter.append('line')
+//          .attr('x1', (bar_width/2)-3)
+//          .attr('y1', function () {
+//            return height - labelOffset - 9;
+//          })
+//          .attr('x2', (bar_width/2)-3)
+//          .attr('y2', function() {
+//            return height - labelOffset - 2;
+//          })
+//          .attr('class','vertical-bar-dash');
       vertEnter.append('text')
-          .attr('x', bar_width/2)
-          .attr('y', function (d) {
-            return height - labelOffset;
+          .attr('x', function (d) {
+            return 0;
           })
-          .attr('dy', '0.6125em')
+          .attr('y', function (d) {
+            //return height - labelOffset;
+            return (bar_width/2) + 5;
+          })
+          .attr('text-anchor', 'end')
+          .attr('dx', '-.5em')
+          //.attr('dy', '0.6125em')
           .text(function (d) {
             return d.name.trim();
-          })
-          .attr('transform', function (d, i) {
-            return 'rotate(' + (70) + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
           });
+//          .attr('transform', function (d, i) {
+//            return 'rotate(' + (70) + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
+//          });
 
       verticalBar.on('mouseover', function(d, i) {
         $scope.$apply(function () {
           $scope.candidate_name = d.name.trim();
-          $scope.candidate_value = d[$scope.option];
+          $scope.candidate_value = $scope.value = nycCampaignFinanceApp.getValue(d[$scope.option], $scope.option);
           $scope.candidate_total = d.candidate_total;
           $scope.candidate_match = d.candidate_match;
           $scope.candidate_contributions = d.candidate_contributions;
@@ -169,30 +174,45 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
 
       var barUpdate = d3.transition(verticalBar)
           .attr('transform', function(d, i) {
-            return 'translate(' + ((i * bar_width)+15) + ', 0)';
+            return 'translate(' + labelOffset + ', ' + ((i * bar_width)+15) + ')';
           });
 
       barUpdate.select('rect')
-          .attr('height', function(d) {
-            return height - labelOffset - totalScale(d[$scope.option]);
+          .attr('width', function(d) {
+            return totalScale(d[$scope.option]);
           })
-          .attr('y', function(d) {
-            return totalScale(d[$scope.option]) - 10;
+          .attr('height', function(d, i) {
+            return bar_width - 5;
           });
+//          .attr('x', function(d) {
+//            return totalScale(d[$scope.option]) - 10;
+//          });
+
+//      barUpdate.select('text')
+//          .attr('x', bar_width/2)
+//          .attr('y', function (d) {
+//            return height - labelOffset;
+//          })
+//          .attr('dy', '0.6125em')
+//          .text(function (d) {
+//            return d.name.trim();
+//          })
+//          .attr('transform', function (d, i) {
+//            return 'rotate(' + (70) + ', ' + (bar_width/2) + ',' + (height - labelOffset) + ')';
+//          });
 
       verticalBar.exit().remove();
 
-      d3.transition(svg).select('.y.axis').call(yAxis);
+      d3.transition(svg).select('.x.axis').call(xAxis);
     }
   };
 
 
 
-  $scope.toggleSelected = function ($event) {
-    console.log($event);
+  $scope.toggleSelected = function ($event, i) {
 
     $(event.target).toggleClass('active');
-    var i = parseInt($event.target.id.replace('can_', ''), 10);
+    //var i = parseInt($event.target.id.replace('can_', ''), 10);
     var selectedIdx = $scope.selectedCandidates.indexOf($scope.candidates[i]);
 
     if (selectedIdx === -1) {
@@ -204,4 +224,22 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
     d3.transition().duration(550).each(function() { $scope.verticalBarGraphRenderer($scope.el, $scope.selectedCandidates); });
   };
 
+    $scope.removeActive = function($event, candidate_id) {
+      console.log($scope.selectedCandidates);
+
+      candidate_id = parseInt(candidate_id, 10);
+
+      $('#can_' + candidate_id).removeClass('active');
+
+      for (var i = 0, len = $scope.selectedCandidates.length; i < len; i++) {
+         if($scope.selectedCandidates[i].candidate_id === candidate_id) {
+           $scope.selectedCandidates.splice(i, 1);
+
+         }
+      }
+    };
+
+    $scope.isSelected = function(candidate_id) {
+        
+    };
 }]);

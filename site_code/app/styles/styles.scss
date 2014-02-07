@@ -394,6 +394,7 @@ text.label-occupation-name {
   opacity: 0;
   transition: opacity .15s;
   z-index: 100;
+  padding: 5px;
 
   &.shown {
     opacity: 1;
@@ -423,6 +424,11 @@ table.funds {
     }
   }
 }
+
+.candidates.graph-wrapper {
+  margin-top: 50px;
+}
+
 
 .loader {
   font-size: 4em;

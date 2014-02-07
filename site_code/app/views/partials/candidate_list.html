@@ -10,13 +10,17 @@
     </ul>
     <hr>
     <ul class="selected-candidates">
-        <li ng-repeat="candidate in selectedCandidates" id="{{candidate.id}}" class="candidate-button-selected">
+        <li ng-repeat="candidate in selectedCandidates" id="{{candidate.id}}"
+            class="candidate-button-selected"
+            ng-click="removeActive($event, candidate.id)">
             {{candidate.name}}
         </li>
     </ul>
     <hr>
     <ul class="candidate-list">
-        <li ng-repeat="candidate in candidates" id="can_{{$index}}" class="candidate-button" ng-click="toggleSelected($event)">
+        <li ng-repeat="candidate in candidates" id="can_{{candidate.id}}"
+            class="candidate-button {{isSelected(candidate.id)}}"
+            ng-click="toggleSelected($event, $index)">
             {{candidate.name}}
         </li>
     </ul>

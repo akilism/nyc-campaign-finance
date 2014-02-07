@@ -88,7 +88,7 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', functi
     color.domain(
             (function (data) {
               return map.call(data, function(d) {
-                console.log(d.contributions);
+               // console.log(d.contributions);
                 return Math.round(d.contributions);
               });
             })(cityData)

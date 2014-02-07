@@ -196,7 +196,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
         $scope.$apply(function () {
           $scope.displayClass = 'shown';
           $scope.name = d.name;
-          $scope.value = getValue(d.value, $scope.option);
+          $scope.value = nycCampaignFinanceApp.getValue(d.value, $scope.option);
         });
         $('.office-details').on('mousemove', function () {
           $(this).css({
@@ -219,16 +219,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
         });
       });
 
-      var getValue = function getValue(val, option) {
-        var is_contributor = (option.indexOf('count') != -1);
-        option = option.replace('_',' ');
 
-        if (is_contributor) {
-          return val.toLocaleString();
-        }
-
-        return '$' + val.toMoney();
-      }
 
       var officeUpdate = d3.transition(office)
           .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-80) + ')' });

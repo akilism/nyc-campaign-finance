@@ -161,6 +161,7 @@ nycCampaignFinanceApp.positionToolTip = function(id, width) {
     var $$tooltip = $('#' + id);
     $$tooltip.css('display','inline-block');
     $$tooltip.css('top', (event.pageY - ($$tooltip.height()/2)) + 'px');
+    $$tooltip.addClass('shown');
 
     if((event.x + $$tooltip.width()) < width) {
         $$tooltip.css('left', event.x + 5 + 'px');
@@ -171,6 +172,7 @@ nycCampaignFinanceApp.positionToolTip = function(id, width) {
 
 nycCampaignFinanceApp.hideToolTip = function(id) {
     var $$tooltip = $('#' + id);
+    $$tooltip.removeClass('shown');
     $$tooltip.css('display','none');
 };
 
@@ -206,3 +208,14 @@ nycCampaignFinanceApp.addOrdinal = function (num) {
 nycCampaignFinanceApp.emitLoaded = function ($rootScope) {
   $rootScope.$emit('$NYCCampFiLoaded');
 };
+
+nycCampaignFinanceApp.getValue = function getValue(val, option) {
+  var is_contributor = (option.indexOf('count') != -1);
+  option = option.replace('_',' ');
+
+  if (is_contributor) {
+    return val.toLocaleString();
+  }
+
+  return '$' + val.toMoney();
+}
