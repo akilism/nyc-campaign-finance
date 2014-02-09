@@ -1,5 +1,3 @@
-__author__ = 'akil.harris'
-
 import random
 import math
 

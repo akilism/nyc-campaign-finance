@@ -41,24 +41,20 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
     });
   };
 
-  $scope.byTotal = function byTotal() {
-    $scope.option = 'total';
-    d3.transition().duration(550).each(function() { $scope.officeBubble($scope.el, $scope.offices); });
+  $scope.byTotal = function byTotal($event) {
+    nycCampaignFinanceApp.sort($event, 'total', $scope, 'officeBubble', 'offices');
   };
 
-  $scope.byContributions = function byContributions() {
-    $scope.option = 'total_contributions';
-    d3.transition().duration(550).each(function() { $scope.officeBubble($scope.el, $scope.offices); });
+  $scope.byContributions = function byContributions($event) {
+    nycCampaignFinanceApp.sort($event, 'total_contributions', $scope, 'officeBubble', 'offices');
   };
 
-  $scope.byMatch = function byMatch() {
-    $scope.option = 'total_match';
-    d3.transition().duration(550).each(function() { $scope.officeBubble($scope.el, $scope.offices); });
+  $scope.byMatch = function byMatch($event) {
+    nycCampaignFinanceApp.sort($event, 'total_match', $scope, 'officeBubble', 'offices');
   };
 
-  $scope.byContributors = function byContributors() {
-    $scope.option = 'count_contributors';
-    d3.transition().duration(550).each(function() { $scope.officeBubble($scope.el, $scope.offices); });
+  $scope.byContributors = function byContributors($event) {
+    nycCampaignFinanceApp.sort($event, 'count_contributors', $scope, 'officeBubble', 'offices');
   };
 
   $scope.officeBubble = function(el, data) {
@@ -79,12 +75,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
                   return Math.round(d[$scope.option]);
                 });
               })(data)
-          ).range(['#034e7b', '#0c2c84', '#225ea8',
-            '#1d91c0', '#41b6c4', '#7fcdbb',
-            '#c7e9b4', '#ffffcc', '#f7fcb9',
-            '#d9f0a3', '#addd8e', '#78c679',
-            '#41ab5d', '#238443', '#006837',
-            '#004529']);
+          ).range(['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b']);
 
       var fontColor = d3.scale.quantile();
       fontColor.domain(
@@ -93,12 +84,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
                   return Math.round(d[$scope.option]);
                 });
               })(data)
-          ).range(['#fff', '#fff', '#fff',
-            '#000', '#000', '#000',
-            '#000', '#000', '#000',
-            '#000', '#000', '#000',
-            '#000', '#fff', '#fff',
-            '#fff']);
+          ).range(['#000', '#fff']);
 
       var root = {};
       root.name = 'offices';
@@ -126,6 +112,8 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
       }
 
       var svg = $scope.svg;
+
+      //Setup pack layout.
       var bubbles = d3.layout.pack()
           .sort(null)
           .size([diameter, diameter])
@@ -135,32 +123,30 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
             return !d.children;
           });
 
-      var office = svg.selectAll('g')
+      //add bubble groups.
+      var bubble = svg.selectAll('g')
           .data(bubbles)
           .sort(function (a, b) {
             return b[$scope.option] - a[$scope.option];
           });
 
-      var officeEnter = office.enter()
+      var bubbleEnter = bubble.enter()
           .append('g')
           .attr('class','bubble')
           .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-120) + ')' });
 
-      officeEnter.append('title')
-          .text(function (d) {
-            return d.name + ' - $' + d.value.toMoney();
-          });
-
-      officeEnter.append('circle').transition()
+      bubbleEnter.append('circle').transition()
           .attr('r', function(d) {
-            return d.r + 5;
+            return d.r + 4;
           })
           .style('fill', function (d) {
             return color(d.value);
-          });
+          })
+          .style('stroke','rgb(189, 255, 210)')
+          .style('stroke-width', '2px');
 
 
-      officeEnter.append('text')
+      bubbleEnter.append('text')
           .attr('dy', '.075em')
           .attr('class', 'bubble-name')
           .style('font-size', function (d) {
@@ -174,7 +160,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
             return d.name.substring(0, d.r / 3);
           });
 
-      officeEnter.append('text')
+      bubbleEnter.append('text')
           .attr('dy', '1.25em')
           .attr('class', 'bubble-value')
           .style('text-anchor', 'middle')
@@ -188,11 +174,10 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
             return '$' + d.value.toMoney().substring(0, d.r / 3);
           });
 
-      officeEnter.on('click', function (d, i) {
+      bubbleEnter.on('click', function (d, i) {
         window.location.href = '/office/' + d.office_id;
       });
-
-      officeEnter.on('mouseover', function(d, i) {
+      bubbleEnter.on('mouseover', function(d, i) {
         $scope.$apply(function () {
           $scope.displayClass = 'shown';
           $scope.name = d.name;
@@ -205,12 +190,10 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
           });
         });
       });
-
-      officeEnter.on('mouseout', function () {
+      bubbleEnter.on('mouseout', function () {
         $('.office-details').removeClass('shown');
       });
-
-      officeEnter.on('mousemove', function () {
+      bubbleEnter.on('mousemove', function () {
         var $$officeDetails = $('.office-details');
         $$officeDetails.addClass('shown');
         $$officeDetails.css({
@@ -219,20 +202,20 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
         });
       });
 
-
-
-      var officeUpdate = d3.transition(office)
+      var bubbleUpdate = bubble.transition()
           .attr('transform', function(d) { return 'translate(' + d.x + ',' + (d.y-120) + ')' });
 
-      officeUpdate.select('circle')
+      bubbleUpdate.select('circle')
           .attr('r', function(d) {
-            return d.r + 5;
+            return d.r + 4;
           })
           .style('fill', function (d) {
             return color(d.value);
-          });
+          })
+          .style('stroke','rgb(189, 255, 210)')
+          .style('stroke-width', '1px');
 
-      office.select('.bubble-name')
+      bubble.select('.bubble-name')
           .attr('dy', '.075em')
           .style('font-size', function (d) {
             return (d.r *.015) + 'em';
@@ -244,7 +227,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
             return d.name.substring(0, d.r / 3);
           });
 
-      office.select('.bubble-value')
+      bubble.select('.bubble-value')
           .attr('dy', function (d) {
             if(d.r * .015 < .5) {
               return '2.75em';
@@ -264,15 +247,6 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
             }
             return '$' + d.value.toMoney().substring(0, d.r / 3);
           });
-
-      office.select('title')
-          .text(function (d) {
-            if ($scope.option === 'count_contributors') {
-              return (d.name + ' - ' + d.value.toLocaleString());
-            }
-            return d.name + ' - $' + d.value.toMoney();
-          });
     }
   };
-
 }]);

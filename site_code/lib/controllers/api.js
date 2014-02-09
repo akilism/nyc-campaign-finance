@@ -21,6 +21,7 @@ exports.offices = function (req, res) {
     data_access.dataConnection.fetchOffices(function(result) {
 
         for(var row in result.rows) {
+          if(result.rows.hasOwnProperty(row)) {
             result.rows[row].id = result.rows[row].office_id;
             result.rows[row].office = result.rows[row].office.trim();
             result.rows[row].total_contributions = parseFloat(result.rows[row].total_contributions);
@@ -28,6 +29,7 @@ exports.offices = function (req, res) {
             result.rows[row].total = parseFloat(result.rows[row].total_total);
             result.rows[row].total_match = parseFloat(result.rows[row].total_match);
             result.rows[row].count_contributors = parseInt(result.rows[row].count_contributors, 10);
+        }
         }
 
         res.send(result.rows);
@@ -40,6 +42,7 @@ exports.candidatesByOffice = function(req, res) {
     data_access.dataConnection.fetchCandidatesByOffice(routeParams['officeId'], function(result) {
 
         for(var row in result.rows) {
+          if(result.rows.hasOwnProperty(row)) {
             result.rows[row].id = parseInt(result.rows[row].candidate_id, 10);
             result.rows[row].candidate_id = parseInt(result.rows[row].candidate_id, 10);
             result.rows[row].office_id = parseInt(result.rows[row].office_id, 10);
@@ -49,6 +52,7 @@ exports.candidatesByOffice = function(req, res) {
             result.rows[row].candidate_match = parseFloat(result.rows[row].candidate_match) || 0.00;
             result.rows[row].candidate_total = parseFloat(result.rows[row].candidate_total);
             result.rows[row].count_contributors = parseInt(result.rows[row].count_contributors, 10);
+        }
         }
 
         res.send(result.rows);
@@ -74,9 +78,11 @@ exports.candidateTopOccupations = function (req, res) {
     data_access.dataConnection.fetchCandidateTopNOccupations(routeParams['candidateId'], routeParams['count'], function(result) {
 
         for(var row in result.rows) {
+          if(result.rows.hasOwnProperty(row)) {
             result.rows[row].id = result.rows[row].occupation_id;
             result.rows[row].name = result.rows[row].occupation.trim();
             result.rows[row].total_contributions = parseFloat(result.rows[row].total_contributions);
+          }
         }
 
         res.send(result.rows);
@@ -88,9 +94,11 @@ exports.candidateTopContributors = function (req, res) {
     data_access.dataConnection.fetchCandidateTopNContributors(routeParams['candidateId'], routeParams['count'], function(result) {
 
         for(var row in result.rows) {
+          if(result.rows.hasOwnProperty(row)) {
             result.rows[row].id = result.rows[row].contributor_id;
             result.rows[row].name = result.rows[row].name.trim();
             result.rows[row].total_contributions = parseFloat(result.rows[row].total);
+          }
         }
 
         res.send(result.rows);
@@ -102,9 +110,11 @@ exports.candidateTopEmployers = function (req, res) {
     data_access.dataConnection.fetchCandidateTopNEmployers(routeParams['candidateId'], routeParams['count'], function(result) {
 
         for(var row in result.rows) {
+          if(result.rows.hasOwnProperty(row)) {
             result.rows[row].id = result.rows[row].employer_id;
             result.rows[row].name = result.rows[row].employer.trim();
             result.rows[row].total_contributions = parseFloat(result.rows[row].total_contributions);
+          }
         }
 
         res.send(result.rows);
@@ -114,13 +124,7 @@ exports.candidateTopEmployers = function (req, res) {
 exports.candidateTopZips = function (req, res) {
     var routeParams = req.route.params;
     data_access.dataConnection.fetchCandidateTopNZips(routeParams['candidateId'], routeParams['count'], function(result) {
-
-//        for(var row in result.rows) {
-//            result.rows[row].zip_code = result.rows[row].zip_code.trim();
-//            result.rows[row].total_contributions = parseFloat(result.rows[row].total);
-//        }
-
-        res.send(result.rows[0].zip_json);
+      res.send(result.rows[0].zip_json);
     });
 };
 

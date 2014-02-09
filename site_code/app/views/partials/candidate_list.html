@@ -1,31 +1,32 @@
-<div class="mini-graph">
+<div class="mini-graph clearfix">
+    <div class="nav"><nav><a class="breadcrumb" href="/">Offices</a> > </nav></div>
     <h3>Candidates for {{office}}</h3>
     <hr>
     <loader></loader>
     <ul>
-        <li ng-click="byTotal()" class="chart-option">By Total</li>
-        <li ng-click="byContributions()" class="chart-option">By Contributions</li>
-        <li ng-click="byMatch()" class="chart-option">By Matching Funds</li>
-        <li ng-click="byContributors()" class="chart-option">By Number of Contributors</li>
+        <li ng-click="byTotal($event)" class="chart-option active-option">Total Funds</li>
+        <li ng-click="byContributions($event)" class="chart-option">Contributions</li>
+        <li ng-click="byMatch($event)" class="chart-option">Matching Funds</li>
+        <li ng-click="byContributors($event)" class="chart-option">Number of Contributors</li>
     </ul>
     <hr>
     <ul class="selected-candidates">
         <li ng-repeat="candidate in selectedCandidates" id="{{candidate.id}}"
             class="candidate-button-selected"
-            ng-click="removeActive($event, candidate.id)">
+            ng-class="addActive(candidate.id)"
+            ng-click="removeActive($event, candidate.id, $index)">
             {{candidate.name}}
         </li>
     </ul>
     <hr>
     <ul class="candidate-list">
         <li ng-repeat="candidate in candidates" id="can_{{candidate.id}}"
-            class="candidate-button {{isSelected(candidate.id)}}"
-            ng-click="toggleSelected($event, $index)">
+            class="candidate-button" ng-click="toggleSelected($event, $index)">
             {{candidate.name}}
         </li>
     </ul>
     <div class="candidates graph-wrapper">
-        <svg d3 d3-data="selectedCandidates" d3-renderer="verticalBarGraphRenderer" class="candidate-bar-graph"></svg>
+        <svg d3 d3-data="selectedCandidates" d3-renderer="barGraphRenderer" class="candidate-bar-graph"></svg>
     </div>
     <!--<hr>-->
     <!--<div class="candidate-info-box" style="display: none;">-->

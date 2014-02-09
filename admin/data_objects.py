@@ -1,5 +1,3 @@
-__author__ = 'akil.harris'
-
 import datetime
 from decimal import *
 
@@ -382,6 +380,7 @@ def check_value(value):
     if value is None:
         return 'NULL'
     return value
+
 
 def is_number(s):
     try:

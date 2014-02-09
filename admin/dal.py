@@ -1,4 +1,3 @@
-__author__ = 'akil.harris'
 
 import csv
 import argparse

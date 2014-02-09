@@ -34,35 +34,40 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
 
   });
 
+  $scope.breadCrumb = function() {
+    return '<a href="/" title="Offices">Offices</a> > <a href="/office/' + $scope.candidate.office_id + '" alt="' + $scope.candidate.office + '">';
+  };
+
   $scope.setupMap = function(zipCodes, selector, initalZoom) {
     var map = L.map(selector);
     var zipGroup = L.featureGroup();
-    var popup;
     for (var i = 0, len = zipCodes.length; i < len; i++) {
       var geo = L.geoJson(zipCodes[i].geojson, {
         onEachFeature: function(feature, layer) {
           layer.bindPopup(zipCodes[i].borough + ' - ' + zipCodes[i].zip_code + '<br>Total: $' +
                   zipCodes[i].total.toMoney() +
                   '<br> Contributors: ' + zipCodes[i].count,
-               popup,
                {
                  'keepInView': true,
                  'closeOnClick': false,
                  'closeButton': false
                });
-          console.log(popup);
         }
       });
       zipGroup.addLayer(geo);
     }
     var bounds = zipGroup.getBounds();
+    var popup = zipGroup.getLayers()[0].getLayers()[0]._popup;
     zipGroup.addTo(map);
+    popup.setLatLng(bounds.getCenter());
+    popup.openOn(map);
     map.setView(bounds.getCenter(), initalZoom);
     L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
       maxZoom: 15,
       minZoom: 12,
     }).addTo(map);
+
   };
 
   $scope.occupationPieRenderer = function(el, data) {
@@ -164,26 +169,37 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
   $scope.nameTotalBarGraph = function(el, data) {
     if (data) {
       var margin = { top: 0, right: 0, bottom: 0, left: 0 };
-      var width = 960 - margin.left - margin.right;
+      var width = 900 - margin.left - margin.right;
       var bar_height = 25;
-      var height = (bar_height * data.length) + 50;
+      var count = data.length;
+      var height = (bar_height * count) + 30;
       var domainMax = d3.max(data, function(obj)  {
         return Math.round(obj.total_contributions);
       });
+
       var domainMin = d3.min(data, function(obj)  {
         return Math.round(obj.total_contributions);
       });
+
       var totalScale = d3.scale.linear().domain([0, domainMax]);
+
       var setScaleRange = function(min, max) {
         totalScale = d3.scale.linear().domain([0, domainMax]);
         totalScale = totalScale.rangeRound([min, max]);
       };
+
+      var maxName = d3.max(data, function(obj) {
+        return obj.name.length;
+      });
+
+      var labelOffset = (maxName + .5) * 7.45;
 
       var sorter = function(a, b) {
         if (a.total_contributions > b.total_contributions) { return -1; }
         if (a.total_contributions < b.total_contributions) { return 1; }
         return 0;
       };
+
 
       var getColor = function(d) {
         setScaleRange(150, 900);
@@ -199,21 +215,21 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
           .attr('width',width)
           .attr('height', height);
 
-      setScaleRange(0, width-20);
+      setScaleRange(0, width - labelOffset - 33);
 
       var axis =d3.svg.axis()
-          .scale(totalScale)
+          .scale(totalScale.nice(5))
           .orient("bottom")
-          .ticks(10)
+          .ticks(5)
           .tickFormat(nycCampaignFinanceApp.currencyFormat)
-          .tickSize(height)
-          .tickPadding(10);
+          .tickSize(height - 25)
+          .tickPadding(5);
 
-      svg.append('g').attr('class','x axis').attr('transform','translate(3, -30)').call(axis);
+      svg.append('g').attr('class','x axis').attr('transform','translate(' + labelOffset + ', 0)').call(axis);
 
       var bar = svg.append('g')
-          .attr('class', 'bar')
-          .attr('transform','translate(3, 0)');
+          .attr('class', 'bar Greens')
+          .attr('transform','translate(' + labelOffset + ', 0)');
 
       var label = svg.append('g')
           .attr('class', 'label')
@@ -255,22 +271,19 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
       labels.enter()
           .append("text")
           .sort(sorter)
-          .attr('class', function(d, i) {
-            if (isInside(d)) {
-              return 'bar-label-name';
-            } else {
-              return 'bar-label-name outside';
-            }
-          })
-          .text(function (d) {
+          .attr('class', 'bar-label-name')
+          .text(function(d) {
             return d.name;
           })
-          .attr('transform', function(d, i) {
-            if (isInside(d)) {
-              return 'translate(' + 5 + ',' + ((bar_height * i) + (bar_height/2) + 3) + ')';
-            } else {
-              return 'translate(' + (totalScale(d.total_contributions) + 5) + ',' + ((bar_height * i) + (bar_height/2) + 3) + ')';
-            }
+          .attr('text-anchor', 'end')
+          .attr('dx', function () {
+            return (maxName / 2) + 'em';
+          })
+          .attr('y', function(d, i) {
+            return ((i + 1) * bar_height) - 10;
+          })
+          .attr('x', function (d) {
+            return 0;
           });
     }
   };

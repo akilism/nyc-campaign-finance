@@ -29,6 +29,8 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', functi
                 fillOpacity: '0.9'
               });
 
+              layer.bringToFront();
+
               $scope.$apply(function () {
                 $scope.zip_code = zipCode;
                 $scope.borough = borough;
@@ -66,7 +68,8 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', functi
 //f30cb9efcacd473fa9725b30982cd71b
     L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-      maxZoom: 18
+      maxZoom: 17,
+      minZoom: 11
     }).addTo(map);
   };
 
@@ -92,46 +95,71 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', functi
                 return Math.round(d.contributions);
               });
             })(cityData)
-        ).range(['#034e7b', '#0c2c84', '#225ea8',
-          '#1d91c0', '#41b6c4', '#7fcdbb',
-          '#c7e9b4', '#ffffcc', '#f7fcb9',
-          '#d9f0a3', '#addd8e', '#78c679',
-          '#41ab5d', '#238443', '#006837',
-          '#004529']);
-
+        ).range(['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b']);
+//        .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c', '#f16913', '#d94801', '#a63603', '#7f2704']);
+//        .range(['#034e7b', '#0c2c84', '#225ea8',
+//          '#1d91c0', '#41b6c4', '#7fcdbb',
+//          '#c7e9b4', '#ffffcc', '#f7fcb9',
+//          '#d9f0a3', '#addd8e', '#78c679',
+//          '#41ab5d', '#238443', '#006837',
+//          '#004529']);
 
     for (var i = 0, len = cityData.length; i < len; i++) {
       cityData[i].geojson.color = color(cityData[i].contributions);
-//            console.log(cityData[i].geojson.color + ' - ' + cityData[i].contributions);
     }
 
     var keyColors = [];
 
-    for (i = 0, len = color.quantiles().length; i < len; i++) {
-      //color.quantiles()[i]
-      console.log(color.quantiles()[i] + ' - ' + color(color.quantiles()[i]));
-    }
-
     setupMap(cityData, 'city_map', 11, true);
 
-    var width = Math.ceil(640 / color.quantiles().length);
-    d3.select('#map_key')
+    var blockWidth = 50; //= Math.ceil(640 / color.quantiles().length);
+    var blockHeight = 20;
+    var height = color.quantiles().length * blockHeight;
+
+    var svg = d3.select('#map_key')
         .append('svg')
-        .attr('height', '50')
-        .append('g')
-        .selectAll('rect')
-        .data(color.quantiles())
-        .enter()
-        .append('rect')
-        .attr('height','20')
-        .attr('width', width)
-        .attr('y','0')
-        .attr('x', function(d,i) {
-          return (i * width);
+        .attr('height', height)
+        .attr('width', 200)
+        .attr('class', 'map-key');
+    var key = svg.selectAll('.key-block')
+        .data(color.quantiles());
+
+    var keyEnter = key.enter().append('g')
+        .attr('transform', function(d, i) {
+          return 'translate(0,' + (i * blockHeight) +  ')';
         })
+        .attr('class', 'key-block');
+
+     keyEnter.append('rect')
+        .attr('height', blockHeight)
+        .attr('width', blockWidth)
+        .attr('y','0')
         .style('fill', function(d) {
           return color(d);
         });
+
+    var prevAmt = '$0.00';
+    var count = color.quantiles().length;
+
+    keyEnter.append('text')
+        .text(function (d, i) {
+          if(i === 0) {
+
+          } else if(i === count) {
+
+          } else {
+
+          }
+
+          var dStr = '$' + parseInt(d, 10).toMoney();
+          var keyStr = prevAmt + ' - ' + dStr ;
+          prevAmt = dStr;
+          return dStr;
+
+        })
+        .attr('x', blockWidth + 10)
+        .attr('y', 4)
+        .attr('dy', blockHeight / 2);
 
 
   };

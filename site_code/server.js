@@ -1,13 +1,21 @@
 'use strict';
 
 // Module dependencies.
+
+
+
 var express = require('express'),
-    path = require('path');
+    path = require('path'),
+    dotenv = require('dotenv');
 
 var app = express();
 
+
 // Express Configuration
 app.configure('development', function(){
+
+  dotenv.load();
+
   app.use(require('connect-livereload')());
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, 'app')));

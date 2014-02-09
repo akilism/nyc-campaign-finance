@@ -5,7 +5,8 @@
     "express": "~3.4.3",
     "ejs": "~0.8.4",
     "pg": "2.8.4",
-    "gzippo": "~0.2.0"
+    "gzippo": "~0.2.0",
+    "dotenv": "~0.2.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

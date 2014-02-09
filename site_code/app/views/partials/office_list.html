@@ -1,19 +1,12 @@
-<!--<ul d3 d3-data="offices" d3-renderer="officeRenderer" class="candidate-offices">-->
-    <!--<a ng-repeat="office in offices" ng-href="#/office/{{office.id}}">-->
-        <!--<li >-->
-           <!--{{office.office}}-->
-               <!--<span class="office-total">{{office.total | currency}}</span>-->
-        <!--</li>-->
-    <!--</a>-->
-<!--</ul>-->
 <div class="mini-graph">
+    <a class="city-link" href="/city/" title="Citywide Breakdown">City Wide Break Down by Zip Code.</a>
     <h3>Offices</h3>
     <hr>
     <ul>
-        <li ng-click="byTotal()" class="chart-option">By Total</li>
-        <li ng-click="byContributions()" class="chart-option">By Contributions</li>
-        <li ng-click="byMatch()" class="chart-option">By Matching Funds</li>
-        <li ng-click="byContributors()" class="chart-option">By Number of Contributors</li>
+        <li ng-click="byTotal($event)" class="chart-option active-option">Total Funds</li>
+        <li ng-click="byContributions($event)" class="chart-option">Contributions</li>
+        <li ng-click="byMatch($event)" class="chart-option">Matching Funds</li>
+        <li ng-click="byContributors($event)" class="chart-option">Number of Contributors</li>
     </ul>
     <loader></loader>
     <svg d3 d3-data="offices" d3-renderer="officeBubble" class="office-bubble"></svg>
@@ -24,4 +17,3 @@
         <li>{{value}}</li>
     </ul>
 </div>
-<a href="/city/" title="Citywide Breakdown">City Wide Break Down by Zip Code.</a>

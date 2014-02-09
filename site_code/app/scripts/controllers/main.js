@@ -160,7 +160,8 @@ controllers.controller('ZipCodeListController',['$scope', '$http', function ($sc
 nycCampaignFinanceApp.positionToolTip = function(id, width) {
     var $$tooltip = $('#' + id);
     $$tooltip.css('display','inline-block');
-    $$tooltip.css('top', (event.pageY - ($$tooltip.height()/2)) + 'px');
+    var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+    $$tooltip.css('top', (event.pageY - ($$tooltip.height()/2) - y) + 'px');
     $$tooltip.addClass('shown');
 
     if((event.x + $$tooltip.width()) < width) {
@@ -178,7 +179,7 @@ nycCampaignFinanceApp.hideToolTip = function(id) {
 
 nycCampaignFinanceApp.currencyFormat = function (d) {
     if(d === 0) { return d; }
-    return "$" + d;
+    return "$" + parseFloat(d).toMoney();
 };
 
 nycCampaignFinanceApp.addOrdinal = function (num) {
@@ -219,3 +220,15 @@ nycCampaignFinanceApp.getValue = function getValue(val, option) {
 
   return '$' + val.toMoney();
 }
+
+nycCampaignFinanceApp.sort = function sort($event, option, $scope, viz, data) {
+  if ($scope.option === option) { return; }
+  nycCampaignFinanceApp.toggleActiveOption($event.target);
+  $scope.option = option;
+  d3.transition().duration(550).each(function() { $scope[viz]($scope.el, $scope[data]); });
+};
+
+nycCampaignFinanceApp.toggleActiveOption = function(target) {
+  $('.active-option').toggleClass('active-option');
+  $(target).toggleClass('active-option');
+};
