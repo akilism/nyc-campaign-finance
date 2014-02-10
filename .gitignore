@@ -21,3 +21,7 @@ data_files/0_intermediaries_21_12_2013_041821.csv
 data_files/2013_contribution_121613.csv
 data_files/7_2.csv
 *.csv
+data_files/nyc-zip-code-tabulation-areas-polygons-1-expanded.geojson
+data_files/test.geojson
+data_files/test2.geojson
+data_files/nyc-zip-code-tabulation-areas-polygons-1.geojson
