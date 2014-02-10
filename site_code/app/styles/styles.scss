@@ -1,32 +1,12 @@
 $link: #366eec;
 $hover: #344fff;
 
-$scale0: #034e7b;
-$scale1: #0c2c84;
-$scale2: #225ea8;
-$scale3: #1d91c0;
-$scale4: #41b6c4;
-$scale5: #7fcdbb;
-$scale6: #c7e9b4;
-$scale7: #ffffcc;
-$scale8: #f7fcb9;
-$scale9: #d9f0a3;
-$scale10: #addd8e;
-$scale11: #78c679;
-$scale12: #41ab5d;
-$scale13: #238443;
-$scale14: #006837;
-$scale15: #004529;
-
-
-
 body {
   padding: 10px;
   font-family: 'Lato', Helvetica Neue, Helvetica, Arial;
   color: #18171B;
   width: 925px;
   margin: 0 auto;
-//  background: #0ff;
 }
 
 .leaflet-popup-content {
@@ -36,14 +16,9 @@ body {
 body > div {
   width: 98%;
   padding: 0.625em;
-  /* border: 1px solid black;
-  border-radius: 5px;
-  background-color: #e4eaf0;
-  box-shadow: 10px 10px darkslategray; */
 }
 
 svg {
-//  border: 1px solid black;
   margin: 0;
 }
 
@@ -422,8 +397,6 @@ text.label-occupation-name {
   }
 }
 
-
-
 .office-bubble g.bubble {
 
   &:hover {
@@ -459,9 +432,7 @@ text.label-occupation-name {
 }
 
 table.funds {
-
   border: 1px 0 solid black;
-//  border-width: 1px 0;
 
   tr {
     td {
@@ -568,7 +539,6 @@ table.funds {
 
 .app-wrapper {
   background: #fff;
-//  box-shadow: rgb(94, 94, 94) 5px 5px 0px;
   margin-bottom: 20px;
 }
 
