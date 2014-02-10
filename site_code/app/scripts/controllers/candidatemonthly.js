@@ -104,7 +104,7 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
               $scope.month_total = d.total;
               $scope.year = d.contribution_date.getFullYear();
             });
-            nycCampaignFinanceApp.positionToolTip('candidate_monthly_tooltip', width);
+            nycCampaignFinanceApp.positionToolTip('candidate_monthly_tooltip', width, d3.event);
           })
           .on('mouseleave', function() {
             nycCampaignFinanceApp.hideToolTip('candidate_monthly_tooltip');

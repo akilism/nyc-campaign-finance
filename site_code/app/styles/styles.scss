@@ -18,12 +18,15 @@ $scale13: #238443;
 $scale14: #006837;
 $scale15: #004529;
 
+
+
 body {
   padding: 10px;
   font-family: 'Lato', Helvetica Neue, Helvetica, Arial;
   color: #18171B;
-  min-width: 925px;
-  margin: 0;
+  width: 925px;
+  margin: 0 auto;
+//  background: #0ff;
 }
 
 .leaflet-popup-content {
@@ -61,7 +64,7 @@ a.city-link {
   background: #c7e9c0;
   border-radius: 10px;
   float: right;
-  margin-top: -20px;
+  margin-top: -15px;
 }
 
 h1, h2 {
@@ -92,6 +95,9 @@ ul {
 }
 
 .nav {
+  position: relative;
+  top : -10px;
+
   h3 {
     display: inline;
   }
@@ -103,7 +109,6 @@ ul {
 
 .candidate-details,
 .city-zip-details {
-  width: 40rem;
   border-bottom: 1px solid black;
 
   h1,h2 {
@@ -120,6 +125,12 @@ ul {
     font-weight: 400;
   }
 
+}
+
+#map_key {
+  width: 313px;
+  display: inline-block;
+  margin-top: 20px;
 }
 
 .chart-option {
@@ -141,6 +152,8 @@ ul {
 }
 
 .city-zip-details {
+  width: 576px;
+  display: inline-block;
 
   .sub-text {
     font-weight: 400;
@@ -236,7 +249,7 @@ text.label-occupation-name {
 }
 
 .office-bubble {
-  width: 100%;
+  width: 907px;
 }
 
 .office-wiggle-bar g:hover {
@@ -409,6 +422,8 @@ text.label-occupation-name {
   }
 }
 
+
+
 .office-bubble g.bubble {
 
   &:hover {
@@ -472,9 +487,8 @@ table.funds {
   list-style: none;
   padding: 0;
   width: 143px;
-  text-align: top;
   height: 600px;
-  overflow-y: scroll;
+  overflow-y: auto;
   float: left;
 }
 
@@ -505,11 +519,6 @@ table.funds {
   margin: 2px 5px;
   border-radius: 5px;
   cursor: pointer;
-}
-
-#map_key {
-  float: left;
-  margin-top: 20px;
 }
 
 .throb {
@@ -556,3 +565,31 @@ table.funds {
     opacity: 0;
   }
 }
+
+.app-wrapper {
+  background: #fff;
+//  box-shadow: rgb(94, 94, 94) 5px 5px 0px;
+  margin-bottom: 20px;
+}
+
+.sorry-js,
+.sorry-svg {
+  display: none;
+}
+
+.no-js {
+
+  .app-wrapper { display: none; }
+  .sorry-js {
+    display: block;
+  }
+}
+
+.no-svg {
+
+  .app-wrapper { display: none; }
+  .sorry-svg {
+    display: block;
+  }
+}
+

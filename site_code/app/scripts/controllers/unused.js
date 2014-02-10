@@ -217,3 +217,101 @@ $scope.officeDonut = function(el, data) {
         .call(force.drag);
   }
 };
+
+//from candidate details
+
+$scope.occupationPieRenderer = function(el, data) {
+  if (data) {
+    var width = 320;
+    var height = 320;
+    var radius = Math.min(width, height)/2;
+    var domainMax = $scope.total;
+    var domainMin = d3.min(data, function(obj)  {
+      return Math.round(obj.total);
+    });
+    var totalScale = d3.scale.linear().domain([0, domainMax]);
+    var setScaleRange = function(min, max) {
+      totalScale = d3.scale.linear().domain([0, domainMax]);
+      totalScale = totalScale.rangeRound([min, max]);
+    };
+
+    var occupationPie = d3.layout.pie().value(function (d) {
+      return d.total;
+    }).sort(null);
+
+    var arc = d3.svg.arc().
+        innerRadius(60).
+        outerRadius(radius - 70);
+
+    var pieData = occupationPie(data);
+    var svg = d3.select('.occupation-pie').
+        append('svg').
+        attr('width',width).
+        attr('height', height);
+
+    var pie = svg.append('g').
+        attr('class', 'pie').
+        attr('transform', function(d) {
+          return 'translate(' + width/2 + ',' + height/2 + ')';
+        });
+
+    var label = svg.append('g').
+        attr('class', 'label').
+        attr('transform', function(d) {
+          return 'translate(' + width/2 + ',' + height/2 + ')';
+        });
+
+    setScaleRange(0, Math.PI * 2);
+    var path = pie.
+        datum(data, function(d) {
+          return d.occupation_id;
+        }).selectAll('path').
+        data(occupationPie).
+        enter().
+        append('path').
+        attr('d', arc).
+        style('stroke','#000').
+        style('fill', function(d) {
+          setScaleRange(150, 800);
+          var scaleValue = totalScale(d.value);
+          var r = Math.floor(scaleValue * 0.025);
+          var g = Math.floor(scaleValue * 0.25);
+          var b = Math.floor(scaleValue  * 0.025);
+          return 'rgb(' + r + ', ' + g + ', ' + b +')';
+        });
+
+    var lines = label.datum(data).selectAll("line").data(occupationPie);
+    lines.enter().append("line")
+        .attr("x1", 0)
+        .attr("x2", 0)
+        .attr("y1", -radius + 55)
+        .attr("y2", -radius + 65)
+        .attr("stroke", "gray")
+        .attr("transform", function(d) {  //Calculate the degree of rotation for the center of the arc.
+          return "rotate(" + (d.startAngle+d.endAngle)/2 * (180/Math.PI) + ")";
+        });
+
+    var labels = label.datum(data).selectAll("text").data(occupationPie);
+    lines.enter().append("text")
+        .attr("dy", function(d){
+          if ((d.startAngle+d.endAngle)/2 > Math.PI/2 && (d.startAngle+d.endAngle)/2 < Math.PI*1.5 ) {
+            return 5;
+          } else {
+            return -5;
+          }
+        })
+        .attr("dx", function(d){
+          if ((d.startAngle+d.endAngle)/2 > Math.PI/2 && (d.startAngle+d.endAngle)/2 > Math.PI*1.5 ) {
+            return -60;
+          } else {
+            return 5;
+          }
+        })
+        .attr("transform", function(d) {
+          return "translate(" + Math.cos(((d.startAngle+d.endAngle - Math.PI)/2)) * (radius-55) + "," + Math.sin((d.startAngle+d.endAngle - Math.PI)/2) * (radius-55) + ")";
+        })
+        .text(function (d) {
+          return d.data.name;
+        });
+  }
+};

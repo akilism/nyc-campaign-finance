@@ -157,18 +157,16 @@ controllers.controller('ZipCodeListController',['$scope', '$http', function ($sc
 
 }]);
 
-nycCampaignFinanceApp.positionToolTip = function(id, width) {
-    var $$tooltip = $('#' + id);
-    $$tooltip.css('display','inline-block');
-    var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-    $$tooltip.css('top', (event.pageY - ($$tooltip.height()/2) - y) + 'px');
-    $$tooltip.addClass('shown');
+nycCampaignFinanceApp.positionToolTip = function(id, width, event) {
+  var $$tooltip = $('#' + id);
+  $$tooltip.css('display','inline-block');
+  var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+  $$tooltip.addClass('shown');
 
-    if((event.x + $$tooltip.width()) < width) {
-        $$tooltip.css('left', event.x + 5 + 'px');
-    } else {
-        $$tooltip.css('left', (event.x - $$tooltip.width() - 20) + 'px');
-    }
+  $$tooltip.css({
+    'top':  (event.pageY - ($$tooltip.height()/2) - y) + 'px',
+    'left':  event.pageX + 10 + 'px'
+  });
 };
 
 nycCampaignFinanceApp.hideToolTip = function(id) {

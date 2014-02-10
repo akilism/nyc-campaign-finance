@@ -10,16 +10,20 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
     $scope.total_match = candidate.total_match;
     $scope.total = candidate.total;
 
+    //fetch additional data
     $http.get('/api/candidates/' + $routeParams.candidateId + '/occupations/10').success(function(occupations) {
       $scope.candidate.occupations = occupations;
       nycCampaignFinanceApp.emitLoaded($rootScope);
     });
+
     $http.get('/api/candidates/' + $routeParams.candidateId + '/contributors/10').success(function(contributors) {
       $scope.candidate.contributors = contributors;
     });
+
     $http.get('/api/candidates/' + $routeParams.candidateId + '/employers/10').success(function(employers) {
       $scope.candidate.employers = employers;
     });
+
     $http.get('/api/candidates/' + $routeParams.candidateId + '/zip_codes/1').success(function(zip_codes) {
       $scope.candidate.zip_codes = zip_codes;
 
@@ -70,102 +74,6 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
 
   };
 
-  $scope.occupationPieRenderer = function(el, data) {
-    if (data) {
-      var width = 320;
-      var height = 320;
-      var radius = Math.min(width, height)/2;
-      var domainMax = $scope.total;
-      var domainMin = d3.min(data, function(obj)  {
-        return Math.round(obj.total);
-      });
-      var totalScale = d3.scale.linear().domain([0, domainMax]);
-      var setScaleRange = function(min, max) {
-        totalScale = d3.scale.linear().domain([0, domainMax]);
-        totalScale = totalScale.rangeRound([min, max]);
-      };
-
-      var occupationPie = d3.layout.pie().value(function (d) {
-        return d.total;
-      }).sort(null);
-
-      var arc = d3.svg.arc().
-          innerRadius(60).
-          outerRadius(radius - 70);
-
-      var pieData = occupationPie(data);
-      var svg = d3.select('.occupation-pie').
-          append('svg').
-          attr('width',width).
-          attr('height', height);
-
-      var pie = svg.append('g').
-          attr('class', 'pie').
-          attr('transform', function(d) {
-            return 'translate(' + width/2 + ',' + height/2 + ')';
-          });
-
-      var label = svg.append('g').
-          attr('class', 'label').
-          attr('transform', function(d) {
-            return 'translate(' + width/2 + ',' + height/2 + ')';
-          });
-
-      setScaleRange(0, Math.PI * 2);
-      var path = pie.
-          datum(data, function(d) {
-            return d.occupation_id;
-          }).selectAll('path').
-          data(occupationPie).
-          enter().
-          append('path').
-          attr('d', arc).
-          style('stroke','#000').
-          style('fill', function(d) {
-            setScaleRange(150, 800);
-            var scaleValue = totalScale(d.value);
-            var r = Math.floor(scaleValue * 0.025);
-            var g = Math.floor(scaleValue * 0.25);
-            var b = Math.floor(scaleValue  * 0.025);
-            return 'rgb(' + r + ', ' + g + ', ' + b +')';
-          });
-
-      var lines = label.datum(data).selectAll("line").data(occupationPie);
-      lines.enter().append("line")
-          .attr("x1", 0)
-          .attr("x2", 0)
-          .attr("y1", -radius + 55)
-          .attr("y2", -radius + 65)
-          .attr("stroke", "gray")
-          .attr("transform", function(d) {  //Calculate the degree of rotation for the center of the arc.
-            return "rotate(" + (d.startAngle+d.endAngle)/2 * (180/Math.PI) + ")";
-          });
-
-      var labels = label.datum(data).selectAll("text").data(occupationPie);
-      lines.enter().append("text")
-          .attr("dy", function(d){
-            if ((d.startAngle+d.endAngle)/2 > Math.PI/2 && (d.startAngle+d.endAngle)/2 < Math.PI*1.5 ) {
-              return 5;
-            } else {
-              return -5;
-            }
-          })
-          .attr("dx", function(d){
-            if ((d.startAngle+d.endAngle)/2 > Math.PI/2 && (d.startAngle+d.endAngle)/2 > Math.PI*1.5 ) {
-              return -60;
-            } else {
-              return 5;
-            }
-          })
-          .attr("transform", function(d) {
-            return "translate(" + Math.cos(((d.startAngle+d.endAngle - Math.PI)/2)) * (radius-55) + "," + Math.sin((d.startAngle+d.endAngle - Math.PI)/2) * (radius-55) + ")";
-          })
-          .text(function (d) {
-            return d.data.name;
-          });
-    }
-  };
-
   $scope.nameTotalBarGraph = function(el, data) {
     if (data) {
       var margin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -201,21 +109,15 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
       };
 
 
-      var getColor = function(d) {
-        setScaleRange(150, 900);
-        var scaleValue = totalScale(d.total_contributions);
-        var r = Math.floor(scaleValue * 0.025);
-        var g = Math.floor(scaleValue * 0.25);
-        var b = Math.floor(scaleValue  * 0.025);
-        return 'rgb(' + r + ', ' + g + ', ' + b +')';
-      };
-
+      var color = d3.scale.quantile();
+      color.domain([0, domainMax])
+          .range(['#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b']);
 
       var svg = el
           .attr('width',width)
           .attr('height', height);
 
-      setScaleRange(0, width - labelOffset - 33);
+      setScaleRange(10, width - labelOffset - 33);
 
       var axis =d3.svg.axis()
           .scale(totalScale.nice(5))
@@ -225,10 +127,10 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
           .tickSize(height - 25)
           .tickPadding(5);
 
-      svg.append('g').attr('class','x axis').attr('transform','translate(' + labelOffset + ', 0)').call(axis);
+      svg.append('g').attr('class','x axis').attr('transform','translate(' + (labelOffset-10) + ', 0)').call(axis);
 
       var bar = svg.append('g')
-          .attr('class', 'bar Greens')
+          .attr('class', 'bar')
           .attr('transform','translate(' + labelOffset + ', 0)');
 
       var label = svg.append('g')
@@ -240,7 +142,6 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
             return d.id;
           });
 
-
       rect.enter()
           .append('rect')
           .sort(sorter)
@@ -251,7 +152,9 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
           .attr('y', function(d, i) {
             return (i * (bar_height));
           })
-          .style('fill', getColor);
+          .style('fill', function(d) {
+            return color(d.total_contributions);
+          });
 
       var labels = label
           .selectAll("text")
@@ -260,13 +163,6 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
           });
 
       setScaleRange(0, width);
-
-      var isInside = function (d) {
-        if(d.name.length*11 > totalScale(d.total_contributions)) {
-          return false;
-        }
-        return true;
-      };
 
       labels.enter()
           .append("text")
@@ -285,6 +181,17 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
           .attr('x', function (d) {
             return 0;
           });
+
+      rect.on('mouseover', function(d, i) {
+        $scope.$apply(function () {
+          $scope.name = d.name;
+          $scope.value = '$' + d.total_contributions.toMoney();
+        });
+        nycCampaignFinanceApp.positionToolTip('bar_info', '', d3.event);
+      })
+      .on('mouseleave', function() { nycCampaignFinanceApp.hideToolTip('bar_info'); })
+      .on('mousemove', function () { nycCampaignFinanceApp.positionToolTip('bar_info', '', d3.event); })
+
     }
   };
 }]);

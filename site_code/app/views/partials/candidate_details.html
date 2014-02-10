@@ -1,7 +1,8 @@
 <div class="nav">
     <nav>
         <a href="/" title="Offices">Offices</a> >
-        <a ng-href="/office/{{candidate.office_id}}" alt="{{candidate.office}}">{{candidate.office}}</a>
+        <a ng-href="/office/{{candidate.office_id}}" alt="{{candidate.office}}">{{candidate.office}}</a> >
+        <span>{{candidate.name}}</span>
     </nav>
 </div>
 <div class="candidate-details">
@@ -42,4 +43,9 @@
         <!--{{zipTotal | currency}}-->
     <!--</p>-->
     <div id="mini_map"></div>
+</div>
+
+<div id="bar_info" class="bar-info tooltip">
+    {{name}}<br />
+    {{value}}
 </div>

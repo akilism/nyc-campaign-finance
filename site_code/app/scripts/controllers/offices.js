@@ -14,33 +14,6 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
     nycCampaignFinanceApp.emitLoaded($rootScope);
   });
 
-  $scope.officeRenderer = function(el, data) {
-
-    var totalScale = d3.scale.linear().domain([0, d3.max(data, function(obj)  {
-      return Math.round(obj.total_contributions);
-    })]);
-
-    var setScaleRange = function(min, max) {
-      totalScale = totalScale.rangeRound([min, max]);
-    };
-
-    var off = el.selectAll('li');
-    off.data(offices);
-    off.each( function(d, i) {
-      setScaleRange(150, 640);
-      var scaleValue = totalScale(d.total_contributions);
-      d3.select(this).style({
-        'background-color': function(d) {
-          var r = Math.floor(scaleValue * 0.025);
-          var g = Math.floor(scaleValue * 0.25);
-          var b = Math.floor(scaleValue  * 0.025);
-          return 'rgb(' + r + ', ' + g + ', ' + b +')';
-        },
-        'width': function(d) { return scaleValue + 'px'; }
-      });
-    });
-  };
-
   $scope.byTotal = function byTotal($event) {
     nycCampaignFinanceApp.sort($event, 'total', $scope, 'officeBubble', 'offices');
   };
@@ -183,23 +156,13 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
           $scope.name = d.name;
           $scope.value = nycCampaignFinanceApp.getValue(d.value, $scope.option);
         });
-        $('.office-details').on('mousemove', function () {
-          $(this).css({
-            'top': event.y - 20,
-            'left': event.x + 12
-          });
-        });
+        nycCampaignFinanceApp.positionToolTip('office_details', '', d3.event);
       });
       bubbleEnter.on('mouseout', function () {
-        $('.office-details').removeClass('shown');
+        nycCampaignFinanceApp.hideToolTip('office_details');
       });
-      bubbleEnter.on('mousemove', function () {
-        var $$officeDetails = $('.office-details');
-        $$officeDetails.addClass('shown');
-        $$officeDetails.css({
-          'top': event.y - 20,
-          'left': event.x + 10
-        });
+      bubbleEnter.on('mousemove', function (d, i) {
+        nycCampaignFinanceApp.positionToolTip('office_details', '', d3.event);
       });
 
       var bubbleUpdate = bubble.transition()
