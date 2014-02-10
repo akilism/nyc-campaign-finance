@@ -191,7 +191,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
 
     $scope.toggleSelected = function ($event, i) {
 
-    $(event.target).toggleClass('active');
+    $(d3.event.target).toggleClass('active');
     //var i = parseInt($event.target.id.replace('can_', ''), 10);
     var selectedIdx = $scope.selectedCandidates.indexOf($scope.candidates[i]);
 
