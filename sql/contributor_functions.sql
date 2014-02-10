@@ -1,12 +1,10 @@
+-- Function: public.fetch_contributor_by_name_zip_c_code_occupation(character, character, character, integer)
 
----***************************************
---- select * from fetch_contributor_by_name_zip_c_code_occupation('Christopher Bennett');
----***************************************
-CREATE OR REPLACE FUNCTION fetch_contributor_by_name_zip_c_code_occupation(p_name character(200), p_c_code character(500),
-                                                                           p_zip_code character(200), p_occupation_id int)
-  RETURNS TABLE(name character(200), contributor_id int, c_code character(500), c_type character(500), borough_code character(5), city character(200), state character(200), occupation_id int, occupation character(500), employer_id int, employer character(500))
-AS
-  $$BEGIN
+-- DROP FUNCTION public.fetch_contributor_by_name_zip_c_code_occupation(character, character, character, integer);
+
+CREATE OR REPLACE FUNCTION public.fetch_contributor_by_name_zip_c_code_occupation(IN p_name character, IN p_c_code character, IN p_zip_code character, IN p_occupation_id integer)
+  RETURNS TABLE(name character, contributor_id integer, c_code character, c_type character, borough_code character, city character, state character, occupation_id integer, occupation character, employer_id integer, employer character) AS
+$BODY$BEGIN
     RETURN QUERY
     SELECT
       con.name,
@@ -27,16 +25,13 @@ AS
       and
       con.zip_code = p_zip_code
       and
-      --con.occupation_id = p_occupation_id
-      CASE p_occupation_id
-        WHEN IS NULL THEN
-          con.occupation_id is NULL
-        ELSE
-          con.occupation_id = p_occupation_id
+      con.occupation_id = p_occupation_id
       and
       con.c_code = p_c_code;
-  END;$$
-LANGUAGE plpgsql;
-COMMENT ON FUNCTION public.fetch_contributor_by_name_zip_c_code_occupation(p_name character(200), p_c_code character(500),
-                                                                           p_zip_code character(200), p_occupation_id int)
-IS 'returns the contributor in the database matching the name, zip, occupation_id and c_code provided.';
+  END;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.fetch_contributor_by_name_zip_c_code_occupation(character, character, character, integer)
+  OWNER TO akil;
+COMMENT ON FUNCTION public.fetch_contributor_by_name_zip_c_code_occupation(character, character, character, integer) IS 'returns the contributor in the database matching the name, zip, occupation_id and c_code provided.';
