@@ -8,7 +8,6 @@
         <li ng-click="byMatch($event)" class="chart-option">Matching Funds</li>
         <li ng-click="byContributors($event)" class="chart-option">Number of Contributors</li>
     </ul>
-    <loader></loader>
     <svg d3 d3-data="offices" d3-renderer="officeBubble" class="office-bubble"></svg>
 </div>
 <div id="office_details" class="office-details tooltip" ng-class="displayClass" ng-click="displayClass=''">

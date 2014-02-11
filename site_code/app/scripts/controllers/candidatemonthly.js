@@ -2,7 +2,7 @@
 
 controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '$http', function ($scope, $routeParams, $http) {
 
-  $http.get('/api/candidates/' + $routeParams.candidateId + '/months').success(function(months) {
+  $http.get('/api/candidate/' + $routeParams.candidateId + '/months').success(function(months) {
     for(var i = 0, len = months.length; i < len; i++) {
       months[i].contribution_date = new Date(months[i].contribution_date);
       months[i].total = parseFloat(months[i].total);

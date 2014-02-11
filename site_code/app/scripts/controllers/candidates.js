@@ -1,34 +1,25 @@
 'use strict';
 
-controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', '$rootScope',
-  function ($scope, $routeParams, $http, $window, $rootScope) {
+controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', 'candidates',
+  function ($scope, $routeParams, $http, $window, candidates) {
     $scope.officeId = $routeParams.officeId;
-    $scope.url = '/api/offices/' + $scope.officeId;
     $scope.option = 'candidate_total';
-
-    $http.get('/api/offices/' + $routeParams.officeId).success(function(candidates) {
-
-      $scope.office = candidates[0].office;
-      $scope.candidate_name = '';
-      $scope.candidate_value = '';
-      $scope.candidate_contributions = '';
-      $scope.candidate_match = '';
-      $scope.detail_link = '';
-      $scope.selectedCandidates = candidates.slice(0, 5);
-      $scope.candidates = candidates.sort(function (a, b) {
-        if(a.name < b.name) { return -1; }
-
-        if(a.name > b.name) { return 1; }
-
-        return 0;
+    $scope.office = candidates[0].office;
+    $scope.candidate_name = '';
+    $scope.candidate_value = '';
+    $scope.candidate_contributions = '';
+    $scope.candidate_match = '';
+    $scope.detail_link = '';
+    $scope.selectedCandidates = candidates.slice(0, 5);
+    $scope.candidates = candidates.sort(function (a, b) {
+      if(a.name < b.name) { return -1; }
+      if(a.name > b.name) { return 1; }
+      return 0;
       });
 
-      nycCampaignFinanceApp.emitLoaded($rootScope);
-
-      for(var i = 0, len = $scope.selectedCandidates.length; i < len; i++) {
-        $('#can_' + $scope.selectedCandidates[i].id).addClass('active');
-      }
-  });
+    for(var i = 0, len = $scope.selectedCandidates.length; i < len; i++) {
+      $('#can_' + $scope.selectedCandidates[i].id).addClass('active');
+    }
 
     $scope.byTotal = function byTotal($event) {
     nycCampaignFinanceApp.sort($event, 'candidate_total', $scope, 'barGraphRenderer', 'selectedCandidates');
