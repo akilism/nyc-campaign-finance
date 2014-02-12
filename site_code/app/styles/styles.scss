@@ -1,5 +1,5 @@
 $link: #366eec;
-$hover: #344fff;
+$hover: #616161;
 
 body {
   padding: 10px;
@@ -190,7 +190,7 @@ text.label-occupation-name {
     text {
       fill: #000;
       stroke: none;
-      font-size: 0.6em;
+      font-size: 0.75em;
     }
   }
 
@@ -252,11 +252,15 @@ text.label-occupation-name {
     &:hover {
       fill: #46e300;
       cursor: pointer;
+
+      text {
+        fill: $hover;
+      }
     }
 
     text {
       fill: $link;
-      font-weight: 400;
+      font-weight: normal;
       text-decoration: underline;
     }
 
@@ -318,7 +322,7 @@ text.label-occupation-name {
 
 .candidate-monthly-graph {
   .y text {
-    font-size: 0.58em;
+    font-size: 0.75em;
   }
 
   .candidate-month-line {
@@ -401,6 +405,8 @@ text.label-occupation-name {
 
   &:hover {
     text-decoration: underline;
+    text-decoration-color: $link;
+    fill: $hover;
     cursor: pointer;
   }
 }
@@ -411,13 +417,13 @@ text.label-occupation-name {
   background-color: rgba(0, 0, 0, 0.73);
   border-radius: 4px;
   opacity: 0;
-  transition: opacity .15s;
+  transition: opacity .5s;
   z-index: 100;
   padding: 5px;
 
   &.shown {
     opacity: 1;
-    transition: opacity .3s;
+    transition: opacity .25s;
   }
 
   ul {
@@ -457,7 +463,7 @@ table.funds {
 .candidate-list {
   list-style: none;
   padding: 0;
-  width: 143px;
+  width: 145px;
   height: 600px;
   overflow-y: auto;
   float: left;
@@ -563,3 +569,31 @@ table.funds {
   }
 }
 
+.footer {
+  border-top: 1px solid #dfdfdf;
+  padding-top: 12px;
+  list-style-type: none;
+
+  li {
+    display: inline-block;
+    color: #464646;
+
+    a {
+      color: #464646;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: #616161;
+      }
+    }
+  }
+}
+
+.office_details {
+  &:hover {
+    display: block;
+  }
+}
+
+.touch .github-banner { display: none; }

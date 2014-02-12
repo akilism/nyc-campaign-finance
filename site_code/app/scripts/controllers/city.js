@@ -69,7 +69,7 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', 'city'
 //f30cb9efcacd473fa9725b30982cd71b
       L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-        maxZoom: 17,
+        maxZoom: 15,
         minZoom: 10
       }).addTo(map);
     };

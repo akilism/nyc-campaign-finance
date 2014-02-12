@@ -157,7 +157,7 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
           nycCampaignFinanceApp.positionToolTip('office_details', '', d3.event);
         });
         bubbleEnter.on('mouseout', function () {
-          nycCampaignFinanceApp.hideToolTip('office_details');
+          nycCampaignFinanceApp.hideToolTip('office_details', d3.event);
         });
         bubbleEnter.on('mousemove', function (d, i) {
           nycCampaignFinanceApp.positionToolTip('office_details', '', d3.event);

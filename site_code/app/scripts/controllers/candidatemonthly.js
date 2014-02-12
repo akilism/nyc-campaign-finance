@@ -18,7 +18,7 @@ controllers.controller('CandidateMonthlyController',['$scope', '$routeParams', '
         return Math.round(obj.total);
       });
 
-      var margin = {top: 0, right: 0, bottom: 0, left: (domainMax > 900000) ? 70 : 60};
+      var margin = {top: 0, right: 0, bottom: 0, left: (domainMax > 900000) ? 90 : 90};
       var width = 900 - margin.left - margin.right;
       var height = 240 - margin.top - margin.bottom;
       var count = data.length;

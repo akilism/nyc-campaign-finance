@@ -165,11 +165,11 @@ nycCampaignFinanceApp.positionToolTip = function(id, width, event) {
 
   $$tooltip.css({
     'top':  (event.pageY - ($$tooltip.height()/2) - y) + 'px',
-    'left':  event.pageX + 10 + 'px'
+    'left':  event.pageX + 15 + 'px'
   });
 };
 
-nycCampaignFinanceApp.hideToolTip = function(id) {
+nycCampaignFinanceApp.hideToolTip = function(id, event) {
     var $$tooltip = $('#' + id);
     $$tooltip.removeClass('shown');
     $$tooltip.css('display','none');
