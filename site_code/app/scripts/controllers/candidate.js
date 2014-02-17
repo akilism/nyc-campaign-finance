@@ -2,7 +2,7 @@
 
 controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '$http', '$rootScope', 'candidate',
   function ($scope, $routeParams, $http, $rootScope, candidate) {
-
+    nycCampaignFinanceApp.emitLoaded($rootScope);
     $scope.candidateId = $routeParams.candidateId;
     $scope.candidate = candidate;
     $scope.total_contributions = candidate.total_contributions;
@@ -176,4 +176,5 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
 
 
 
-}]);
+
+  }]);

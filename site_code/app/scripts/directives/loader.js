@@ -13,7 +13,8 @@ angular.module('NYCCampFi')
         });
 
         $rootScope.$on('$NYCCampFiLoaded', function () {
-          element.addClass('hide');
+         element.addClass('hide');
+
         })
       }
     };

@@ -1,7 +1,8 @@
 'use strict';
 
-controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', 'candidates',
-  function ($scope, $routeParams, $http, $window, candidates) {
+controllers.controller('OfficeCandidateListController',['$scope', '$routeParams', '$http', '$window', '$rootScope', 'candidates',
+  function ($scope, $routeParams, $http, $window, $rootScope, candidates) {
+    nycCampaignFinanceApp.emitLoaded($rootScope);
     $scope.officeId = $routeParams.officeId;
     $scope.option = 'candidate_total';
     $scope.office = candidates[0].office;

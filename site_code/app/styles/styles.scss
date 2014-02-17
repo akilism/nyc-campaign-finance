@@ -39,7 +39,7 @@ a.city-link {
   background: #c7e9c0;
   border-radius: 10px;
   float: right;
-  margin-top: -15px;
+  margin: -15px 0 0 0;
 }
 
 h1, h2 {
@@ -454,10 +454,11 @@ table.funds {
 
 .loader {
   font-size: 4em;
-  color: #2D2B4E;
-  text-shadow: 2px 3px rgb(223, 220, 220);
+ // color: #2D2B4E;
+  color: #fff;
+ // text-shadow: 2px 3px rgb(223, 220, 220);
   text-align: center;
-  margin-top: 33%;
+  margin: 33% 0;
 }
 
 .candidate-list {

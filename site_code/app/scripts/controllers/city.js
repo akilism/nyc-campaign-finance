@@ -2,6 +2,7 @@
 
 controllers.controller('CityController',['$scope', '$http', '$rootScope', 'city',
   function ($scope, $http, $rootScope, city) {
+    nycCampaignFinanceApp.emitLoaded($rootScope);
 
     var setupMap = function(zipCodes, selector, initalZoom, setDetail) {
       var map = L.map(selector);

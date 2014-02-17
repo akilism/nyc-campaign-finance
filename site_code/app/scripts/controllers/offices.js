@@ -2,7 +2,7 @@
 
 controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 'offices',
   function ($scope, $http, $rootScope, offices) {
-
+    nycCampaignFinanceApp.emitLoaded($rootScope);
     $scope.option = 'total';
     $scope.offices = offices;
     $scope.total = 0;
@@ -11,6 +11,8 @@ controllers.controller('OfficeListController',['$scope', '$http', '$rootScope', 
       if(isNaN(prev)) { return prev.total + curr.total; }
       return prev + curr.total;
     });
+
+
 
     $scope.byTotal = function byTotal($event) {
       nycCampaignFinanceApp.sort($event, 'total', $scope, 'officeBubble', 'offices');
