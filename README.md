@@ -31,7 +31,7 @@ Using node and express for the back end.
 * All city zip codes by total amounts: 
   * nyc.wolvesintheserverroom.com/api/city
 
-occupations, contributors, employers, zip codes take a `count` that will determine the amount of results to return.
+_occupations, contributors, employers, zip codes take a `count` that will determine the amount of results to return._
 
 --
 nyc-campaign-finance
