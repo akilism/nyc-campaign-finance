@@ -10,6 +10,7 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
     $scope.total = candidate.total;
     $scope.zip_codes = candidate.zip_codes;
 
+    console.log(candidate);
     $scope.breadCrumb = function() {
       return '<a href="/" title="Offices">Offices</a> > <a href="/office/' + $scope.candidate.office_id + '" alt="' + $scope.candidate.office + '">';
     };
@@ -33,10 +34,14 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
         zipGroup.addLayer(geo);
       }
       var bounds = zipGroup.getBounds();
-      var popup = zipGroup.getLayers()[0].getLayers()[0]._popup;
       zipGroup.addTo(map);
-      popup.setLatLng(bounds.getCenter());
-      popup.openOn(map);
+      var zipLayers = zipGroup.getLayers()[0].getLayers();
+      if (zipLayers.length > 0) {
+        var popup = zipLayers[0]._popup;
+        popup.setLatLng(bounds.getCenter());
+        popup.openOn(map);
+      }
+
       map.setView(bounds.getCenter(), initalZoom);
       L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
@@ -167,7 +172,7 @@ controllers.controller('CandidateDetailsController',['$scope', '$routeParams', '
       }
     };
 
-    if ($scope.zip_codes && $scope.zip_codes.length > 0) {
+    if ($scope.zip_codes && $scope.zip_codes.length > 0 && $scope.zip_codes[0].geojson) {
       $scope.setupMap($scope.zip_codes, 'mini_map', 13);
       $scope.zipTotal = $scope.zip_codes[0].total;
       $scope.zipCode = $scope.zip_codes[0].zip_code;
