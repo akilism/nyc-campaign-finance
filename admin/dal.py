@@ -81,7 +81,7 @@ class DataSet:
             'occupations': False
         }
         self.quick_sort = None
-        self.db = PostgreSQLConnector('nyc_campaign_finance', 'akil', 'c4mpf1y@h', 'localhost', '5432')
+        #add db string
 
     def set_all_data(self, all_data):
         self.all_data = all_data
