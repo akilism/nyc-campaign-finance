@@ -83,7 +83,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
 
         $scope.svg.insert("g")
             .attr('class', 'x axis')
-            .attr('transform','translate(' + (labelOffset- 10) + ', ' + (height - 30) + ')');;
+            .attr('transform','translate(' + (labelOffset- 10) + ', ' + (height - 30) + ')');
       }
 
       var svg = $scope.svg;
@@ -130,7 +130,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
       })
       .attr('text-anchor', 'end')
       .attr('dx', function () {
-        return '-.5em';
+        return '-.75em';
       })
       .text(function (d) {
         return d.name.trim();
@@ -177,7 +177,7 @@ controllers.controller('OfficeCandidateListController',['$scope', '$routeParams'
       bar.exit().remove();
 
       //x axis update transition.
-      d3.transition(svg).select('.x.axis').call(xAxis);
+      d3.transition(svg).select('.x.axis').call(xAxis).attr('transform','translate(' + (labelOffset- 10) + ', ' + (height - 30) + ')');
     }
   };
 

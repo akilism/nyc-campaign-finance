@@ -163,10 +163,18 @@ nycCampaignFinanceApp.positionToolTip = function(id, width, event) {
   var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
   $$tooltip.addClass('shown');
 
-  $$tooltip.css({
-    'top':  (event.pageY - ($$tooltip.height()/2) - y) + 'px',
-    'left':  event.pageX + 15 + 'px'
-  });
+  if(id === 'candidate_monthly_tooltip') {
+    $$tooltip.css({
+      'top':  (event.pageY - ($$tooltip.height()/2)) + 'px',
+      'left':  event.pageX + 15 + 'px'
+    });
+  } else {
+    $$tooltip.css({
+      'top':  (event.pageY - ($$tooltip.height()/2) - y) + 'px',
+      'left':  event.pageX + 15 + 'px'
+    });
+  }
+
 };
 
 nycCampaignFinanceApp.hideToolTip = function(id, event) {
