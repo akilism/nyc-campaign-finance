@@ -16,8 +16,7 @@ app.directive('loader', ['$rootScope', function ($rootScope) {
 
       $rootScope.$on('$NYCCampFiLoaded', function () {
         element.addClass('hide');
-
-      })
+      });
     }
   };
 }]);
