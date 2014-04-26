@@ -67,9 +67,10 @@ controllers.controller('CityController',['$scope', '$http', '$rootScope', 'city'
       var bounds = zipGroup.getBounds();
       zipGroup.addTo(map);
       map.setView(bounds.getCenter(), initalZoom);
-//f30cb9efcacd473fa9725b30982cd71b
-      L.tileLayer('http://{s}.tile.cloudmade.com/f30cb9efcacd473fa9725b30982cd71b/997/256/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+
+
+      L.tileLayer('http://api.tiles.mapbox.com/v3/akilism.i31nhlpm/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 15,
         minZoom: 10
       }).addTo(map);
