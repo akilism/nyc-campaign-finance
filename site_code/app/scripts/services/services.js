@@ -45,5 +45,5 @@ services.factory('Requestor', ['$http', '$q', function($http, $q) {
       }
 
       return getDefer();
-    }
+    };
 }]);
